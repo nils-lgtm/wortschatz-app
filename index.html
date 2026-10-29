@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wortschatz</title>
+<meta name="description" content="Eigene Wörter üben: Wortfindung üben mit Karteikarten.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Wortschatz">
+<meta name="theme-color" content="#FAF7F0">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231F4E79'/%3E%3Crect x='20' y='26' width='60' height='48' rx='8' fill='%23FAF7F0'/%3E%3Ctext x='50' y='62' font-size='30' font-family='Georgia,serif' font-weight='700' text-anchor='middle' fill='%231F4E79'%3EAa%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #FAF7F0;
+    --karte: #FFFFFF;
+    --text: #1A1A1A;
+    --leise: #4A4A4A;
+    --linie: #CFC8B8;
+    --blau: #1F4E79;
+    --blau-hell: #E3ECF5;
+    --gruen: #23652A;
+    --gruen-hell: #E2F0E3;
+    --orange: #8A4B00;
+    --orange-hell: #FBEFD9;
+    --rot: #9B1C1C;
+    --rot-hell: #FBE9E9;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 21px; line-height: 1.45;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 16px 16px 40px; }
+  h1 { font-size: 30px; margin: 8px 0 16px; line-height: 1.2; }
+  h2 { font-size: 24px; margin: 28px 0 10px; }
+  p { margin: 8px 0; }
+  .leise { color: var(--leise); }
+  .ansicht { display: none; }
+  .ansicht.aktiv { display: block; }
+
+  button, .knopf {
+    font: inherit; font-size: 22px; font-weight: 600;
+    min-height: 60px; width: 100%; padding: 14px 18px;
+    border-radius: 14px; border: 2px solid var(--blau);
+    background: var(--karte); color: var(--blau); cursor: pointer;
+    margin: 8px 0; display: block; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button.haupt { background: var(--blau); color: #fff; }
+  button.gruen { background: var(--gruen); border-color: var(--gruen); color: #fff; }
+  button.leise-knopf { border-color: var(--linie); color: var(--text); font-weight: 500; }
+  button.rot { border-color: var(--rot); color: var(--rot); }
+  button.rot-voll { background: var(--rot); border-color: var(--rot); color: #fff; }
+  button.klein { min-height: 48px; font-size: 19px; padding: 8px 14px; width: auto; display: inline-block; margin: 4px 6px 4px 0; }
+  button.textknopf { border: none; background: none; color: var(--blau); min-height: 48px; font-size: 19px; font-weight: 500; text-decoration: underline; }
+  button:disabled { opacity: .45; }
+  button:active { transform: scale(.99); }
+  .zurueck { border: none; background: none; color: var(--blau); width: auto; min-height: 48px; padding: 8px 0; margin: 0 0 4px; font-size: 21px; }
+
+  .kasten { background: var(--karte); border: 2px solid var(--linie); border-radius: 18px; padding: 18px; margin: 12px 0; }
+  .zahlen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+  .zahl { background: var(--karte); border: 2px solid var(--linie); border-radius: 16px; padding: 12px 6px; text-align: center; }
+  .zahl b { display: block; font-size: 32px; line-height: 1.1; color: var(--blau); }
+  .zahl span { font-size: 16px; color: var(--leise); }
+  .hinweis { background: var(--blau-hell); border-radius: 14px; padding: 12px 16px; margin: 12px 0; font-size: 19px; }
+  .warnung { background: var(--orange-hell); color: #4A2A00; border-radius: 14px; padding: 12px 16px; margin: 12px 0; font-size: 19px; }
+  .willkommen-box { background: var(--gruen-hell); color: #123d17; border-radius: 14px; padding: 12px 16px; margin: 12px 0; font-size: 20px; }
+  .bestaetigung { background: var(--rot-hell); border: 2px solid var(--rot); border-radius: 16px; padding: 14px 16px; margin: 10px 0; }
+  .bestaetigung p { margin: 0 0 6px; font-weight: 600; }
+  .bestaetigung.neutral { background: var(--blau-hell); border-color: var(--blau); }
+
+  .logo { width: 96px; height: 96px; margin: 18px auto 6px; display: block; }
+  #v-willkommen h1 { text-align: center; font-size: 34px; }
+  #v-willkommen #w-text { font-size: 22px; }
+
+  .namen button { font-size: 30px; min-height: 86px; border-width: 3px; margin: 12px 0; }
+  .namen button span { display: block; font-size: 17px; font-weight: 500; color: var(--leise); }
+
+  .wahl { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .wahl button { margin: 0; font-size: 20px; min-height: 56px; }
+  .wahl button[aria-pressed="true"] { background: var(--blau); color: #fff; }
+
+  label { display: block; font-weight: 600; margin: 16px 0 6px; }
+  input[type=text], input[type=password], input[type=number], textarea {
+    font: inherit; font-size: 22px; width: 100%; padding: 14px; border-radius: 12px;
+    border: 2px solid var(--leise); background: #fff; color: var(--text);
+  }
+  textarea { min-height: 120px; resize: vertical; }
+  input:focus, textarea:focus, button:focus-visible { outline: 3px solid #F2A900; outline-offset: 2px; }
+
+  .uebkarte { background: var(--karte); border: 3px solid var(--blau); border-radius: 22px; padding: 22px 20px; margin: 10px 0 14px; }
+  .uebkarte .erkl { font-size: 25px; line-height: 1.4; font-family: Georgia, "Times New Roman", serif; }
+  .fortschritt { font-size: 18px; color: var(--leise); display: flex; justify-content: space-between; }
+  .tipps { list-style: none; padding: 0; margin: 10px 0; }
+  .tipps li { background: var(--orange-hell); border-radius: 12px; padding: 10px 14px; margin: 8px 0; font-size: 21px; }
+  .tipps li b { color: var(--orange); }
+  .luecke { font-family: Menlo, Consolas, monospace; letter-spacing: 2px; font-size: 24px; }
+  .loesung { text-align: center; font-size: 36px; font-weight: 700; color: var(--blau); margin: 10px 0; }
+  .rueckmeldung { border-radius: 16px; padding: 16px; margin: 12px 0; font-size: 22px; text-align: center; }
+  .rueckmeldung.gut { background: var(--gruen-hell); color: #123d17; }
+  .rueckmeldung.mittel { background: var(--orange-hell); color: #4A2A00; }
+  .punkte { font-size: 30px; font-weight: 700; display: block; margin-top: 4px; }
+
+  .liste { list-style: none; padding: 0; margin: 0; }
+  .liste li { background: var(--karte); border: 2px solid var(--linie); border-radius: 14px; padding: 12px 14px; margin: 8px 0; }
+  .liste .kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .liste .wort { font-size: 23px; font-weight: 700; }
+  .stand { font-size: 16px; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .stand.neu { background: var(--blau-hell); color: var(--blau); }
+  .stand.lernt { background: var(--orange-hell); color: var(--orange); }
+  .stand.sicher { background: var(--gruen-hell); color: var(--gruen); }
+  .schwer-liste { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; margin: 8px 0; }
+  .schwer-liste li { background: var(--orange-hell); color: #4A2A00; border-radius: 999px; padding: 6px 14px; font-weight: 600; }
+  .klein-text { font-size: 17px; }
+  .zeile { display: flex; gap: 8px; }
+  .zeile > * { flex: 1; }
+  .unsichtbar { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+
+<!-- ============ WILLKOMMEN / NEUES KONTO ============ -->
+<section id="v-willkommen" class="ansicht" aria-label="Willkommen">
+  <button class="zurueck unsichtbar" id="w-zurueck">‹ Zurück</button>
+  <svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1F4E79"/><rect x="20" y="26" width="60" height="48" rx="8" fill="#FAF7F0"/><text x="50" y="62" font-size="30" font-family="Georgia,serif" font-weight="700" text-anchor="middle" fill="#1F4E79">Aa</text></svg>
+  <h1 id="w-titel">Willkommen!</h1>
+  <p id="w-text"></p>
+  <label for="f-name">Wie heißt du?</label>
+  <input type="text" id="f-name" autocomplete="given-name" autocapitalize="words" spellcheck="false" maxlength="30" placeholder="Dein Vorname">
+  <p id="w-meldung" class="warnung unsichtbar"></p>
+  <button class="haupt" id="k-konto-anlegen">Los geht’s</button>
+  <p class="leise klein-text" id="w-fuss">Mehrere Personen können dieses iPhone benutzen. Jede bekommt ein eigenes Konto mit eigenen Wörtern und Punkten.</p>
+</section>
+
+<!-- ============ KONTOWAHL ============ -->
+<section id="v-konten" class="ansicht" aria-label="Konto wählen">
+  <h1>Wer übt heute?</h1>
+  <p class="leise">Tipp auf deinen Namen.</p>
+  <p id="konten-meldung" class="hinweis unsichtbar"></p>
+  <div id="konten-liste" class="namen"></div>
+  <button class="leise-knopf" id="k-konto-neu" style="margin-top:20px">+ Neues Konto</button>
+</section>
+
+<!-- ============ START ============ -->
+<section id="v-start" class="ansicht" aria-label="Startseite">
+  <h1 id="gruss">Guten Tag!</h1>
+  <p id="start-willkommen" class="willkommen-box unsichtbar"></p>
+  <div class="zahlen">
+    <div class="zahl"><b id="z-faellig">0</b><span>heute dran</span></div>
+    <div class="zahl"><b id="z-punkte">0</b><span>Punkte heute</span></div>
+    <div class="zahl"><b id="z-serie">0</b><span id="z-serie-text">Tage in Folge</span></div>
+  </div>
+
+  <div id="start-leer" class="kasten unsichtbar">
+    <p><b>Noch keine Wörter da.</b></p>
+    <p>Wenn dir ein Wort fehlt und jemand es dir sagt: tipp es hier ein.</p>
+    <button class="leise-knopf" id="k-beispiele">Zum Ausprobieren: 10 Beispielwörter übernehmen</button>
+  </div>
+
+  <div id="start-ueben">
+    <p style="margin-bottom:6px"><b>Wie lange üben?</b></p>
+    <div class="wahl" id="laenge-wahl">
+      <button data-l="k10">10 Karten</button>
+      <button data-l="k20">20 Karten</button>
+      <button data-l="m15">15 Minuten</button>
+      <button data-l="m30">30 Minuten</button>
+    </div>
+    <button class="haupt" id="k-ueben" style="margin-top:14px">Jetzt üben</button>
+    <p class="hinweis" id="sitzungs-hinweis">Tipp: 2 kurze Sitzungen am Tag wirken am besten, zum Beispiel morgens und abends.</p>
+  </div>
+
+  <button id="k-neu">+ Neues Wort eintragen</button>
+
+  <div id="schwer-block" class="unsichtbar">
+    <h2>Diese Wörter fallen dir noch schwer</h2>
+    <ul class="schwer-liste" id="schwer-liste"></ul>
+  </div>
+
+  <div class="zeile" style="margin-top:18px">
+    <button class="leise-knopf" id="k-liste">Meine Wörter</button>
+    <button class="leise-knopf" id="k-einst">Einstellungen</button>
+  </div>
+  <button class="textknopf unsichtbar" id="k-start-wechseln">Konto wechseln</button>
+</section>
+
+<!-- ============ NEUES WORT ============ -->
+<section id="v-neu" class="ansicht" aria-label="Neues Wort">
+  <button class="zurueck" data-zu="start">‹ Zurück</button>
+  <h1 id="neu-titel">Neues Wort</h1>
+  <div id="neu-schritt1">
+    <label for="f-wort">Welches Wort willst du üben?</label>
+    <input type="text" id="f-wort" autocomplete="off" autocapitalize="sentences" spellcheck="true" placeholder="zum Beispiel: Spritze">
+    <p class="leise klein-text">Du kannst auch das Mikrofon auf der Tastatur benutzen und das Wort sagen.</p>
+    <button class="haupt" id="k-weiter">Weiter</button>
+  </div>
+  <div id="neu-schritt2" class="unsichtbar">
+    <div class="kasten" style="text-align:center"><span class="leise klein-text">Das Wort</span><div class="loesung" id="n-wort-anzeige"></div></div>
+    <p id="n-quelle" class="hinweis"></p>
+    <button id="k-ki" class="unsichtbar">Erklärung von der KI holen</button>
+    <label for="f-erkl">Erklärung (die siehst du beim Üben)</label>
+    <textarea id="f-erkl" placeholder="Beschreib in 1 bis 2 Sätzen, was das ist. Das Wort selbst nicht verwenden."></textarea>
+    <p id="n-warn" class="warnung unsichtbar">Achtung: Das Wort steht in der Erklärung. Beim Üben wäre es dann zu leicht.</p>
+    <label for="f-kat">Gruppe (zum Beispiel Küche, Werkzeug)</label>
+    <input type="text" id="f-kat" autocomplete="off">
+    <div class="zeile">
+      <div><label for="f-art">Artikel</label><input type="text" id="f-art" autocomplete="off" placeholder="der, die, das"></div>
+      <div><label for="f-silben">Silben</label><input type="number" id="f-silben" min="1" max="12" inputmode="numeric"></div>
+    </div>
+    <label for="f-reim">Reimwort (klingt ähnlich)</label>
+    <input type="text" id="f-reim" autocomplete="off">
+    <button class="gruen" id="k-speichern" style="margin-top:20px">Speichern</button>
+    <button class="leise-knopf rot unsichtbar" id="k-loeschen-bearb">Wort löschen</button>
+  </div>
+</section>
+
+<!-- ============ ÜBEN ============ -->
+<section id="v-ueben" class="ansicht" aria-label="Üben">
+  <button class="zurueck" id="k-ueben-ende">‹ Beenden</button>
+  <div class="fortschritt"><span id="u-fortschritt">Karte 1</span><span id="u-punkte">0 Punkte</span></div>
+  <div class="uebkarte">
+    <div class="leise klein-text">Welches Wort ist gemeint?</div>
+    <div class="erkl" id="u-erkl"></div>
+    <button class="leise-knopf klein" id="k-vorlesen" type="button">Vorlesen</button>
+  </div>
+  <ul class="tipps" id="u-tipps"></ul>
+
+  <div id="u-frage">
+    <label for="f-antwort" style="margin-top:4px">Deine Antwort</label>
+    <input type="text" id="f-antwort" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" placeholder="Wort tippen oder laut sagen">
+    <button class="haupt" id="k-pruefen">Prüfen</button>
+    <button class="gruen" id="k-weiss">Ich weiß es (laut gesagt)</button>
+    <button id="k-tipp">Tipp bekommen</button>
+    <button class="leise-knopf" id="k-aufdecken">Ich komme nicht drauf</button>
+  </div>
+
+  <div id="u-selbst" class="unsichtbar">
+    <div class="loesung" id="u-selbst-wort"></div>
+    <p style="text-align:center">Hattest du dieses Wort?</p>
+    <div class="zeile">
+      <button class="gruen" id="k-selbst-ja">Ja</button>
+      <button class="leise-knopf" id="k-selbst-nein">Nein</button>
+    </div>
+  </div>
+
+  <div id="u-ergebnis" class="unsichtbar">
+    <div class="loesung" id="u-loesung"></div>
+    <div class="rueckmeldung" id="u-rueck"></div>
+    <button class="haupt" id="k-naechste">Nächste Karte</button>
+  </div>
+</section>
+
+<!-- ============ SITZUNG FERTIG ============ -->
+<section id="v-fertig" class="ansicht" aria-label="Fertig">
+  <h1 id="fertig-titel">Geschafft!</h1>
+  <div class="kasten" id="fertig-text"></div>
+  <button class="haupt" data-zu="start">Zur Startseite</button>
+</section>
+
+<!-- ============ WORTLISTE ============ -->
+<section id="v-liste" class="ansicht" aria-label="Meine Wörter">
+  <button class="zurueck" data-zu="start">‹ Zurück</button>
+  <h1>Meine Wörter <span class="leise" id="liste-anzahl"></span></h1>
+  <button id="k-neu2">+ Neues Wort eintragen</button>
+  <ul class="liste" id="wortliste"></ul>
+</section>
+
+<!-- ============ EINSTELLUNGEN ============ -->
+<section id="v-einst" class="ansicht" aria-label="Einstellungen">
+  <button class="zurueck" data-zu="start">‹ Zurück</button>
+  <h1>Einstellungen</h1>
+
+  <h2>Dein Konto</h2>
+  <p>Du übst als <b id="e-name"></b>.</p>
+  <button id="k-name">Namen ändern</button>
+  <div id="name-aendern" class="kasten unsichtbar">
+    <label for="f-neuname" style="margin-top:0">Neuer Name</label>
+    <input type="text" id="f-neuname" autocomplete="off" autocapitalize="words" spellcheck="false" maxlength="30">
+    <div class="zeile">
+      <button class="gruen" id="k-name-speichern">Speichern</button>
+      <button class="leise-knopf" id="k-name-abbrechen">Abbrechen</button>
+    </div>
+  </div>
+  <button id="k-wechseln">Konto wechseln</button>
+  <button class="leise-knopf rot" id="k-konto-loeschen">Konto löschen</button>
+
+  <h2>Sicherung</h2>
+  <p class="warnung"><b>Wichtig:</b> Deine Wörter und Punkte liegen nur auf diesem iPhone. Speichere deshalb ab und zu eine Sicherung und leg die Datei zum Beispiel in iCloud Drive ab (im Fenster „In Dateien sichern“ wählen, dann „iCloud Drive“). So bleibt alles erhalten, auch wenn das iPhone einmal verloren geht.</p>
+  <button id="k-export">Sicherung speichern</button>
+  <button class="leise-knopf" id="k-export-alle">Alle Konten sichern</button>
+  <button class="leise-knopf" id="k-import">Sicherung laden</button>
+  <input type="file" id="f-import" accept="application/json,.json" class="unsichtbar">
+
+  <h2>KI-Erklärungen (nur zum Testen)</h2>
+  <p class="klein-text">Für Wörter, die nicht im eingebauten Wörterbuch stehen, kann die KI von Anthropic (Claude) eine Erklärung schreiben. Dafür braucht es einen API-Schlüssel. Er gilt für alle Konten auf diesem Gerät.</p>
+  <p class="warnung klein-text">Nur für den Test: Der Schlüssel bleibt auf diesem Gerät, steht aber ungeschützt im Browser. In der echten App läuft das über einen eigenen Server.</p>
+  <label for="f-key">API-Schlüssel</label>
+  <input type="password" id="f-key" autocomplete="off" placeholder="sk-ant-...">
+  <button id="k-key">Schlüssel speichern</button>
+
+  <h2>Neu anfangen</h2>
+  <button class="leise-knopf rot" id="k-reset">Alle Wörter und Punkte dieses Kontos löschen</button>
+  <p id="einst-meldung" class="hinweis unsichtbar"></p>
+  <p class="leise klein-text" style="margin-top:20px">Wortschatz, Prototyp 0.2</p>
+</section>
+
+</main>
+
+<script>
+"use strict";
+
+/* ======================================================================
+   Startwörterbuch: w = Wort, a = Artikel, k = Gruppe, r = Reimwort,
+   e = Erklärung (ohne das Wort selbst), s = Silben (optional, sonst berechnet)
+   ====================================================================== */
+const WOERTERBUCH = [
+  {w:"Spritze", a:"die", k:"Medizin", r:"Witze", e:"Damit gibt der Arzt ein Medikament unter die Haut. Vorne hat sie eine feine Nadel."},
+  {w:"Gießkanne", a:"die", k:"Garten", r:"Pfanne", e:"Damit gibt man den Blumen Wasser. Sie hat einen langen Hals, vorne oft mit vielen kleinen Löchern."},
+  {w:"Schraubenzieher", a:"der", k:"Werkzeug", r:"Trauben-Zieher", e:"Ein Werkzeug mit Griff und schmaler, flacher Spitze. Damit dreht man die kleinen Metallstifte mit Gewinde ins Holz hinein und wieder heraus."},
+  {w:"Thermometer", a:"das", k:"Medizin", r:"Kilometer", e:"Damit misst man, ob jemand Fieber hat. Es gibt so etwas auch für draußen, um die Temperatur abzulesen."},
+  {w:"Briefmarke", a:"die", k:"Post", r:"Harke", e:"Ein kleines Bild aus Papier mit einem Preis darauf. Man klebt es oben rechts auf den Umschlag, damit die Post die Sendung bringt."},
+  {w:"Pflaster", a:"das", k:"Medizin", r:"Laster", e:"Man klebt es auf eine kleine Wunde, damit kein Schmutz hineinkommt."},
+  {w:"Fernbedienung", a:"die", k:"Wohnzimmer", r:"Stern-Bedienung", e:"Ein kleines Gerät mit vielen Tasten. Damit schaltet man vom Sessel aus den Fernseher ein und wechselt das Programm."},
+  {w:"Kleiderbügel", a:"der", k:"Kleidung", r:"Hügel", e:"Darauf hängt man Hemden, Blusen und Jacken in den Schrank."},
+  {w:"Wäscheklammer", a:"die", k:"Haushalt", r:"Hammer", e:"Damit macht man nasse Hemden und Socken an der Leine fest, damit sie nicht wegfliegen."},
+  {w:"Korkenzieher", a:"der", k:"Küche", r:"Socken-Zieher", e:"Damit holt man den Stopfen aus einer Weinflasche. Er hat eine Spirale aus Metall."},
+  {w:"Dosenöffner", a:"der", k:"Küche", r:"Hosen-Öffner", e:"Damit schneidet man den Deckel einer Konservendose auf."},
+  {w:"Nudelholz", a:"das", k:"Küche", r:"Stolz", e:"Eine Rolle aus Holz mit zwei Griffen. Damit rollt man Teig flach aus."},
+  {w:"Schneebesen", a:"der", k:"Küche", r:"gewesen", e:"Damit schlägt man Sahne oder Eiweiß steif. Er besteht aus vielen gebogenen Drähten."},
+  {w:"Sieb", a:"das", k:"Küche", r:"Dieb", e:"Eine Schale mit vielen kleinen Löchern. Damit gießt man das Wasser von den Nudeln ab."},
+  {w:"Trichter", a:"der", k:"Küche", r:"Dichter", e:"Oben weit, unten eng. Damit füllt man Flüssigkeit in eine Flasche, ohne etwas zu verschütten."},
+  {w:"Topflappen", a:"der", k:"Küche", r:"Kappen", e:"Ein dickes Stück Stoff. Damit fasst man heiße Töpfe an, ohne sich die Finger zu verbrennen."},
+  {w:"Schöpfkelle", a:"die", k:"Küche", r:"Welle", e:"Ein großer Löffel mit langem Stiel. Damit füllt man Suppe aus dem Topf in den Teller."},
+  {w:"Reibe", a:"die", k:"Küche", r:"Scheibe", e:"Ein Küchengerät mit scharfen Löchern. Damit macht man Käse oder Möhren ganz klein."},
+  {w:"Eierbecher", a:"der", k:"Küche", r:"Sprecher", e:"Ein kleines Gefäß. Darin steht beim Frühstück das gekochte Ei."},
+  {w:"Thermoskanne", a:"die", k:"Küche", r:"Wanne", e:"Ein Gefäß, in dem Kaffee oder Tee lange heiß bleibt. Man nimmt es gern mit auf Ausflüge."},
+  {w:"Kehrblech", a:"das", k:"Haushalt", r:"Pech", e:"Eine flache Schaufel. Darauf fegt man mit dem kleinen Besen den Schmutz vom Boden."},
+  {w:"Bügeleisen", a:"das", k:"Haushalt", r:"Reisen", e:"Ein Gerät, das heiß wird. Damit macht man Hemden und Blusen wieder glatt."},
+  {w:"Nähnadel", a:"die", k:"Haushalt", r:"Tadel", e:"Ein dünnes, spitzes Stück Metall mit einem kleinen Loch für den Faden. Damit näht man einen Knopf an."},
+  {w:"Fingerhut", a:"der", k:"Haushalt", r:"Mut", e:"Eine kleine Kappe aus Metall, die man beim Nähen aufsetzt. Sie schützt vor dem Stich der Nadel."},
+  {w:"Wärmflasche", a:"die", k:"Haushalt", r:"Tasche", e:"Ein weicher Beutel aus Gummi. Man füllt heißes Wasser hinein und nimmt ihn mit ins Bett."},
+  {w:"Glühbirne", a:"die", k:"Haushalt", r:"Stirne", e:"Man schraubt sie in die Lampe. Wenn man den Schalter drückt, gibt sie Licht."},
+  {w:"Steckdose", a:"die", k:"Haushalt", r:"Hose", e:"Ein Anschluss in der Wand. Dort schließt man das Kabel eines Geräts an, damit es Strom bekommt."},
+  {w:"Batterie", a:"die", k:"Haushalt", r:"Knie", e:"Sie gibt Strom für kleine Geräte wie Taschenlampe oder Uhr. Wenn sie leer ist, muss man sie wechseln."},
+  {w:"Taschenlampe", a:"die", k:"Haushalt", r:"Rampe", e:"Ein kleines Licht zum Mitnehmen. Damit leuchtet man im Dunkeln den Weg."},
+  {w:"Wecker", a:"der", k:"Schlafzimmer", r:"Bäcker", e:"Eine Uhr am Bett. Morgens klingelt sie, damit man aufwacht."},
+  {w:"Bettdecke", a:"die", k:"Schlafzimmer", r:"Schnecke", e:"Damit deckt man sich in der Nacht zu, damit man nicht friert."},
+  {w:"Gardine", a:"die", k:"Wohnzimmer", r:"Biene", e:"Ein heller, dünner Stoff, der vor dem Fenster hängt."},
+  {w:"Türklinke", a:"die", k:"Haus", r:"Finke", e:"Man drückt sie nach unten, um die Tür zu öffnen."},
+  {w:"Briefkasten", a:"der", k:"Post", r:"fasten", e:"Ein Behälter mit einem Schlitz am Haus oder an der Straße. Dort hinein kommt die Post."},
+  {w:"Klingel", a:"die", k:"Haus", r:"Kringel", e:"Ein Knopf neben der Haustür. Wenn man drückt, hört man drinnen einen Ton."},
+  {w:"Schlüsselbund", a:"der", k:"Haus", r:"Hund", e:"Alles zum Aufschließen von Haustür, Keller und Auto, zusammen an einem Ring."},
+  {w:"Regenschirm", a:"der", k:"Kleidung", r:"Segen-Schirm", e:"Man spannt ihn über dem Kopf auf, damit man bei schlechtem Wetter nicht nass wird."},
+  {w:"Schnürsenkel", a:"der", k:"Kleidung", r:"Henkel", e:"Ein langes Band am Schuh. Man bindet daraus eine Schleife, damit der Schuh fest sitzt."},
+  {w:"Reißverschluss", a:"der", k:"Kleidung", r:"Fluss", e:"Zwei Reihen kleiner Zähne an der Jacke. Man zieht ihn hoch, dann ist die Jacke zu."},
+  {w:"Hosenträger", a:"der", k:"Kleidung", r:"Jäger", e:"Zwei Bänder über den Schultern. Sie halten die Hose oben."},
+  {w:"Lesebrille", a:"die", k:"Alltag", r:"Grille", e:"Man setzt sie auf die Nase, um kleine Schrift in Zeitung oder Buch besser zu sehen."},
+  {w:"Zahnbürste", a:"die", k:"Badezimmer", r:"Würste", e:"Damit putzt man morgens und abends die Zähne."},
+  {w:"Kamm", a:"der", k:"Badezimmer", r:"Lamm", e:"Damit bringt man die Haare in Ordnung. Er hat viele feine Zinken."},
+  {w:"Pinzette", a:"die", k:"Badezimmer", r:"Kette", e:"Eine kleine Zange aus Metall. Damit zieht man einen Splitter aus der Haut."},
+  {w:"Tablette", a:"die", k:"Medizin", r:"Kette", e:"Eine kleine runde Arznei. Man schluckt sie mit einem Schluck Wasser."},
+  {w:"Verband", a:"der", k:"Medizin", r:"Wand", e:"Ein Stoffstreifen, den man um eine Wunde wickelt."},
+  {w:"Krücke", a:"die", k:"Medizin", r:"Brücke", e:"Eine Stütze unter dem Arm oder an der Hand. Damit läuft man, wenn ein Bein verletzt ist."},
+  {w:"Zange", a:"die", k:"Werkzeug", r:"Schlange", e:"Ein Werkzeug mit zwei Griffen. Damit packt man etwas fest oder zieht einen Nagel heraus."},
+  {w:"Zollstock", a:"der", k:"Werkzeug", r:"Rock", e:"Ein Maß zum Aufklappen, meist gelb. Damit misst man, wie lang etwas ist."},
+  {w:"Wasserwaage", a:"die", k:"Werkzeug", r:"Lage", e:"Ein langes Werkzeug mit einer kleinen Luftblase. Damit prüft man, ob ein Bild gerade hängt."},
+  {w:"Säge", a:"die", k:"Werkzeug", r:"träge", e:"Ein Werkzeug mit vielen Zähnen. Damit schneidet man Holz durch."},
+  {w:"Schubkarre", a:"die", k:"Garten", r:"Gitarre", e:"Ein Wagen mit einem Rad vorne und zwei Griffen. Damit fährt man Erde oder Steine durch den Garten."},
+  {w:"Rasenmäher", a:"der", k:"Garten", r:"Näher", e:"Ein Gerät, mit dem man das Gras im Garten kurz schneidet."},
+  {w:"Harke", a:"die", k:"Garten", r:"Marke", e:"Ein Gartengerät mit langem Stiel und Zinken. Damit sammelt man Laub ein."},
+  {w:"Gartenschlauch", a:"der", k:"Garten", r:"Bauch", e:"Ein langes, biegsames Rohr. Damit spritzt man Wasser auf Beete und Rasen."},
+  {w:"Blumentopf", a:"der", k:"Garten", r:"Kopf", e:"Ein Gefäß mit Erde. Darin wächst eine Pflanze auf der Fensterbank."},
+  {w:"Kugelschreiber", a:"der", k:"Büro", r:"Treiber", e:"Damit schreibt man auf Papier. Oben hat er oft einen Knopf zum Drücken, dann kommt vorne die Spitze heraus."},
+  {w:"Büroklammer", a:"die", k:"Büro", r:"Hammer", e:"Ein kleiner gebogener Draht. Damit hält man ein paar Blätter Papier zusammen."},
+  {w:"Locher", a:"der", k:"Büro", r:"Kocher", e:"Damit macht man zwei Löcher in Papier, damit es in einen Ordner passt."},
+  {w:"Briefumschlag", a:"der", k:"Post", r:"Tag", e:"Eine Hülle aus Papier für ein Schreiben. Außen stehen Name und Adresse, oben rechts klebt die Marke."},
+  {w:"Kalender", a:"der", k:"Büro", r:"Sender", e:"Darin stehen alle Tage des Jahres. Man trägt dort Termine ein."},
+  {w:"Fernglas", a:"das", k:"Freizeit", r:"Gras", e:"Man hält es vor beide Augen. Damit sieht man Vögel oder Schiffe, die weit weg sind, ganz groß."},
+  {w:"Liegestuhl", a:"der", k:"Freizeit", r:"Stuhl", e:"Ein Sitz zum Ausklappen, in dem man fast liegt. Man stellt ihn im Sommer in den Garten oder an den Strand."},
+  {w:"Hängematte", a:"die", k:"Freizeit", r:"Ratte", e:"Ein Netz oder Tuch zwischen zwei Bäumen. Man legt sich hinein und schaukelt."},
+  {w:"Portemonnaie", a:"das", k:"Alltag", r:"Schnee", s:3, e:"Eine kleine Tasche für Geld und Karten. Man hat sie meist in der Hosentasche oder Handtasche."},
+  {w:"Fahrkarte", a:"die", k:"Unterwegs", r:"Warte", e:"Ein Schein, den man kauft, um mit Bus oder Bahn zu fahren."},
+];
+const BEISPIEL_WOERTER = ["Spritze","Gießkanne","Schraubenzieher","Thermometer","Briefmarke","Pflaster","Fernbedienung","Kleiderbügel","Wäscheklammer","Korkenzieher"];
+
+/* ======================================================================
+   Hilfsfunktionen
+   ====================================================================== */
+const $ = (id) => document.getElementById(id);
+const SPEICHER_SCHLUESSEL = "wortschatz.v1";
+const TIPP_ABZUG = 15;
+const ABSTAENDE = [0, 1, 2, 4, 7, 14, 30]; // Tage je Fach (Leitner)
+
+function heute(d) { d = d || new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function plusTage(n) { const d = new Date(); d.setDate(d.getDate()+n); return heute(d); }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function zufall(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+function normal(s) {
+  return String(s || "").toLowerCase().trim()
+    .replace(/^(der|die|das|ein|eine)\s+/, "")
+    .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")
+    .replace(/[^a-z]/g, "");
+}
+function abstand(a, b) { // Levenshtein
+  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  let prev = Array.from({length:n+1}, (_,j)=>j);
+  for (let i=1;i<=m;i++) { const cur=[i]; for (let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a[i-1]===b[j-1]?0:1)); prev=cur; }
+  return prev[n];
+}
+/* Ergebnis: "richtig" | "fast" | "falsch" */
+function vergleiche(eingabe, wort) {
+  const a = normal(eingabe), b = normal(wort);
+  if (!a) return "falsch";
+  if (a === b) return "richtig";
+  const d = abstand(a, b);
+  const erlaubt = b.length >= 9 ? 2 : (b.length >= 4 ? 1 : 0);
+  return d <= erlaubt ? "fast" : "falsch";
+}
+function silbenZaehlen(wort) {
+  let w = String(wort).toLowerCase().replace(/[^a-zäöüß]/g, "");
+  w = w.replace(/(äu|eu|au|ei|ai|ie|aa|ee|oo)/g, "a");
+  const gruppen = w.match(/[aeiouäöüy]+/g);
+  return Math.max(1, gruppen ? gruppen.length : 1);
+}
+function lueckenWort(wort) {
+  const z = [...wort];
+  if (z.length <= 2) return z.join(" ");
+  return z.map((c,i) => (i===0 || i===z.length-1 || c===" " || c==="-") ? c : "_").join(" ");
+}
+function imWoerterbuch(wort) {
+  const n = normal(wort);
+  return WOERTERBUCH.find(x => normal(x.w) === n) || null;
+}
+function erklaerungEnthaeltWort(erkl, wort) {
+  const n = normal(wort); if (n.length < 3) return false;
+  return erkl.toLowerCase().split(/[^a-zäöüß]+/).some(t => { const nt = normal(t); return nt.length>=3 && (nt.includes(n) || (n.length>=5 && nt.includes(n.slice(0,5)))); });
+}
+
+/* ======================================================================
+   Speicher mit Konten (localStorage mit try/catch, Ersatz im Arbeitsspeicher)
+   Aufbau "wortschatz.v2": { version, apiKey (geräteweit), aktiv, konten:[{id, name, angelegt, daten}] }
+   daten je Konto: { karten, tage, einstellungen:{ laenge } }
+   Altes Format "wortschatz.v1" (ein Stand ohne Konten) wird beim ersten Start übernommen.
+   ====================================================================== */
+const SPEICHER_V2 = "wortschatz.v2";
+let speicherOk = true;
+function neueId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function leereDaten() { return { karten:[], tage:{}, einstellungen:{ laenge:"k10" } }; }
+function datenPruefen(d) {
+  d = d || {};
+  const e = Object.assign({ laenge:"k10" }, d.einstellungen || {}); delete e.apiKey;
+  return { karten: Array.isArray(d.karten) ? d.karten : [], tage: (d.tage && typeof d.tage === "object") ? d.tage : {}, einstellungen: e };
+}
+function kontoPruefen(k) {
+  k = k || {};
+  return { id: k.id || neueId(), name: String(k.name || "").trim().slice(0,30), angelegt: k.angelegt || heute(), daten: datenPruefen(k.daten) };
+}
+function lesen(schluessel) {
+  try { const t = localStorage.getItem(schluessel); return t ? JSON.parse(t) : null; }
+  catch (e) { speicherOk = false; return null; }
+}
+function sichern() {
+  try { localStorage.setItem(SPEICHER_V2, JSON.stringify(G)); speicherOk = true; }
+  catch (e) { speicherOk = false; }
+}
+
+let G = { version:2, apiKey:"", aktiv:null, konten:[] };
+let ALT = null; // Altdaten, die noch einem Konto zugeordnet werden
+(function ladenStart() {
+  const d = lesen(SPEICHER_V2);
+  if (d && Array.isArray(d.konten)) {
+    G = { version:2, apiKey: d.apiKey || "", aktiv: d.aktiv || null, konten: d.konten.map(kontoPruefen) };
+    G.konten.forEach(k => { if (!k.name) k.name = "Ohne Namen"; });
+    return;
+  }
+  const alt = lesen(SPEICHER_SCHLUESSEL);
+  if (alt && typeof alt === "object") {
+    G.apiKey = (alt.einstellungen && alt.einstellungen.apiKey) || "";
+    if ((Array.isArray(alt.karten) && alt.karten.length) || Object.keys(alt.tage || {}).length) ALT = alt;
+  }
+})();
+
+let K = null; // aktives Konto
+let S = null; // Daten des aktiven Kontos (K.daten)
+function kontoWaehlen(id) {
+  K = G.konten.find(k => k.id === id) || null;
+  S = K ? K.daten : null; G.aktiv = K ? K.id : null; sichern();
+}
+function datenSetzen(konto, daten) { konto.daten = daten; if (konto === K) S = daten; }
+function kontoAnlegen(name, daten) {
+  const k = { id: neueId(), name, angelegt: heute(), daten: daten || leereDaten() };
+  G.konten.push(k); return k;
+}
+function nameVergeben(name, ausser) { const n = name.toLowerCase(); return G.konten.some(k => k !== ausser && k.name.toLowerCase() === n); }
+function freierName(name) { let n = name, i = 2; while (nameVergeben(n)) n = name + " (" + (i++) + ")"; return n; }
+function sauber(name) { return String(name || "").trim().replace(/\s+/g, " ").slice(0,30); }
+
+function tag(t) { t = t || heute(); if (!S.tage[t]) S.tage[t] = { punkte:0, karten:0, sitzungen:0 }; return S.tage[t]; }
+
+function karteAnlegen(d) {
+  return { id: neueId(), wort: d.wort.trim(), artikel: (d.artikel||"").trim(), erklaerung: d.erklaerung.trim(),
+    kategorie: (d.kategorie||"").trim(), reim: (d.reim||"").trim(), silben: d.silben || silbenZaehlen(d.wort),
+    fach: 0, faellig: heute(), angelegt: heute(), versuche: 0, richtig: 0, letztePunkte: [], zuletzt: null };
+}
+function beispieleUebernehmen(daten) {
+  BEISPIEL_WOERTER.forEach(w => { const d = imWoerterbuch(w); if (d && !daten.karten.some(k => normal(k.wort) === normal(w))) daten.karten.push(karteAnlegen({ wort:d.w, artikel:d.a, erklaerung:d.e, kategorie:d.k, reim:d.r, silben:d.s })); });
+}
+function stand(k) {
+  if (!k.versuche) return { text:"Neu", cls:"neu" };
+  if (k.fach >= 4) return { text:"Sicher", cls:"sicher" };
+  return { text:"Wird gelernt", cls:"lernt" };
+}
+function istSchwer(k) {
+  if (!k.versuche) return false;
+  const l = (k.letztePunkte || []).slice(-3); const schnitt = l.reduce((a,b)=>a+b,0) / (l.length||1);
+  return schnitt < 60 || l[l.length-1] === 0;
+}
+function faelligeKarten() { const t = heute(); return S.karten.filter(k => k.faellig <= t); }
+function serie() {
+  let n = 0; const d = new Date();
+  if (!(S.tage[heute(d)] && S.tage[heute(d)].karten)) d.setDate(d.getDate()-1);
+  while (S.tage[heute(d)] && S.tage[heute(d)].karten > 0) { n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+/* Ab und zu den Namen ins Lob setzen: "Sehr gut!" wird "Sehr gut, Klaus!" */
+function mitName(text, chance) {
+  if (!K || Math.random() > (chance == null ? 0.35 : chance)) return text;
+  return text.replace(/[.!]/, m => ", " + K.name + m);
+}
+
+/* ======================================================================
+   Bestätigung im Seiteninhalt (statt confirm)
+   ====================================================================== */
+function bestaetigungSchliessen() { const b = $("bestaetigung"); if (b) b.remove(); }
+/* ort: Element, unter dem die Frage erscheint. optionen: [{ text, cls, fn }]; "Abbrechen" kommt immer dazu. */
+function bestaetigen(ort, frage, optionen, neutral) {
+  bestaetigungSchliessen();
+  const box = document.createElement("div");
+  box.id = "bestaetigung"; box.className = "bestaetigung" + (neutral ? " neutral" : ""); box.setAttribute("role", "alertdialog");
+  const p = document.createElement("p"); p.textContent = frage; box.appendChild(p);
+  optionen.concat([{ text:"Abbrechen", cls:"leise-knopf", fn:null }]).forEach(o => {
+    const b = document.createElement("button"); b.textContent = o.text; b.className = o.cls || "";
+    b.addEventListener("click", () => { bestaetigungSchliessen(); if (o.fn) o.fn(); });
+    box.appendChild(b);
+  });
+  ort.insertAdjacentElement("afterend", box);
+  try { box.scrollIntoView({ block:"nearest", behavior:"smooth" }); } catch (e) {}
+}
+
+/* ======================================================================
+   Ansichten
+   ====================================================================== */
+let startHinweis = null;
+let kontenMeldung = null;
+function zeige(name) {
+  if (["start","neu","ueben","fertig","liste","einst"].includes(name) && !K) return appStart();
+  bestaetigungSchliessen();
+  document.querySelectorAll(".ansicht").forEach(v => v.classList.remove("aktiv"));
+  $("v-"+name).classList.add("aktiv");
+  window.scrollTo(0,0);
+  if (name !== "start") startHinweis = null;
+  if (name === "start") startZeichnen();
+  if (name === "liste") listeZeichnen();
+  if (name === "konten") kontenZeichnen();
+  if (name === "einst") einstZeichnen();
+}
+document.querySelectorAll("[data-zu]").forEach(b => b.addEventListener("click", () => zeige(b.dataset.zu)));
+
+function appStart() {
+  if (!G.konten.length) return willkommenZeigen(ALT ? "alt" : "erst");
+  if (G.konten.length > 1) { K = null; S = null; return zeige("konten"); }
+  kontoWaehlen(G.konten[0].id); zeige("start");
+}
+
+/* ---------- Willkommen / neues Konto ---------- */
+let wModus = "erst", wZurueck = null;
+function willkommenZeigen(modus, zurueck) {
+  wModus = modus; wZurueck = zurueck || null;
+  const n = ALT && Array.isArray(ALT.karten) ? ALT.karten.length : 0;
+  $("w-titel").textContent = modus === "neu" ? "Neues Konto" : (modus === "alt" ? "Willkommen zurück!" : "Willkommen!");
+  $("w-text").textContent = modus === "neu" ? "Wer möchte hier üben? Jedes Konto hat eigene Wörter, eigene Punkte und eigene Tage in Folge."
+    : modus === "alt" ? "Deine bisherigen " + n + (n === 1 ? " Wort ist" : " Wörter sind") + " noch da. Ab jetzt hat jede Person ein eigenes Konto. Sag mir deinen Namen, dann kommen deine Wörter in dein Konto."
+    : "Schön, dass du da bist! Hier übst du Wörter, die dir im Gespräch gerade nicht einfallen. Ganz in Ruhe, mit Tipps und Punkten.";
+  $("k-konto-anlegen").textContent = modus === "neu" ? "Konto anlegen" : "Los geht’s";
+  $("w-zurueck").classList.toggle("unsichtbar", !wZurueck);
+  $("w-fuss").classList.toggle("unsichtbar", modus === "neu");
+  $("f-name").value = ""; $("w-meldung").classList.add("unsichtbar");
+  zeige("willkommen");
+}
+$("w-zurueck").addEventListener("click", () => { if (wZurueck === "einst" && K) zeige("einst"); else zeige("konten"); });
+$("f-name").addEventListener("keydown", e => { if (e.key === "Enter") kontoAnlegenKlick(); });
+$("k-konto-anlegen").addEventListener("click", kontoAnlegenKlick);
+function kontoAnlegenKlick() {
+  const name = sauber($("f-name").value);
+  const m = $("w-meldung");
+  if (!name) { m.textContent = "Bitte schreib deinen Namen in das Feld."; m.classList.remove("unsichtbar"); $("f-name").focus(); return; }
+  if (nameVergeben(name)) { m.textContent = "Den Namen „" + name + "“ gibt es hier schon. Nimm zum Beispiel noch den ersten Buchstaben vom Nachnamen dazu."; m.classList.remove("unsichtbar"); $("f-name").focus(); return; }
+  let daten;
+  if (wModus === "alt" && ALT) {
+    daten = datenPruefen(ALT); ALT = null;
+    startHinweis = "Schön, dass du wieder da bist, " + name + "! Deine " + daten.karten.length + " Wörter sind jetzt in deinem Konto.";
+  } else {
+    daten = leereDaten(); beispieleUebernehmen(daten);
+    startHinweis = "Schön, dass du da bist, " + name + "! Zum Start sind schon " + daten.karten.length + " Wörter da. Eigene Wörter trägst du mit „+ Neues Wort eintragen“ ein.";
+  }
+  const k = kontoAnlegen(name, daten);
+  kontoWaehlen(k.id);
+  const hinweis = startHinweis; zeige("start"); startHinweis = hinweis; startZeichnen();
+}
+
+/* ---------- Kontowahl ---------- */
+function kontenZeichnen() {
+  $("konten-liste").innerHTML = G.konten.map(k => {
+    const n = k.daten.karten.length;
+    return "<button class='haupt' data-konto='" + esc(k.id) + "'>" + esc(k.name) + "<span style='color:#E3ECF5'>" + n + (n === 1 ? " Wort" : " Wörter") + "</span></button>";
+  }).join("");
+  const m = $("konten-meldung");
+  m.classList.toggle("unsichtbar", !kontenMeldung); m.textContent = kontenMeldung || ""; kontenMeldung = null;
+}
+$("konten-liste").addEventListener("click", e => {
+  const b = e.target.closest("button[data-konto]"); if (!b) return;
+  kontoWaehlen(b.dataset.konto); zeige("start");
+});
+$("k-konto-neu").addEventListener("click", () => willkommenZeigen("neu", "konten"));
+
+/* ---------- Startseite ---------- */
+function startZeichnen() {
+  const h = new Date().getHours();
+  const gruss = h < 11 ? "Guten Morgen" : (h < 18 ? "Guten Tag" : "Guten Abend");
+  $("gruss").textContent = gruss + ", " + K.name + "!";
+  $("start-willkommen").classList.toggle("unsichtbar", !startHinweis);
+  $("start-willkommen").textContent = startHinweis || "";
+  const f = faelligeKarten().length;
+  $("z-faellig").textContent = f;
+  $("z-punkte").textContent = tag().punkte;
+  const s = serie(); $("z-serie").textContent = s; $("z-serie-text").textContent = s === 1 ? "Tag in Folge" : "Tage in Folge";
+  const leer = S.karten.length === 0;
+  $("start-leer").classList.toggle("unsichtbar", !leer);
+  $("start-ueben").classList.toggle("unsichtbar", leer);
+  $("k-ueben").textContent = f > 0 ? "Jetzt üben (" + f + (f === 1 ? " Wort dran)" : " Wörter dran)") : "Extra-Runde üben";
+  const sitz = tag().sitzungen;
+  $("sitzungs-hinweis").textContent = sitz === 0 ? "Tipp: 2 kurze Sitzungen am Tag wirken am besten, zum Beispiel morgens und abends."
+    : sitz === 1 ? "Schön, die erste Sitzung heute ist geschafft. Später noch eine zweite?" : "Heute schon " + sitz + " Sitzungen. Sehr gut, " + K.name + "!";
+  document.querySelectorAll("#laenge-wahl button").forEach(b => b.setAttribute("aria-pressed", b.dataset.l === S.einstellungen.laenge ? "true" : "false"));
+  const schwer = S.karten.filter(istSchwer).sort((a,b)=>a.fach-b.fach || a.letztePunkte.slice(-1)[0]-b.letztePunkte.slice(-1)[0]).slice(0,8);
+  $("schwer-block").classList.toggle("unsichtbar", schwer.length === 0);
+  $("schwer-liste").innerHTML = schwer.map(k => "<li>"+esc(k.wort)+"</li>").join("");
+  $("k-start-wechseln").classList.toggle("unsichtbar", G.konten.length < 2);
+  $("k-start-wechseln").textContent = "Nicht " + K.name + "? Konto wechseln";
+}
+document.querySelectorAll("#laenge-wahl button").forEach(b => b.addEventListener("click", () => { S.einstellungen.laenge = b.dataset.l; sichern(); startZeichnen(); }));
+$("k-beispiele").addEventListener("click", () => { beispieleUebernehmen(S); sichern(); startZeichnen(); });
+$("k-neu").addEventListener("click", () => neuStarten());
+$("k-neu2").addEventListener("click", () => neuStarten());
+$("k-liste").addEventListener("click", () => zeige("liste"));
+$("k-einst").addEventListener("click", () => zeige("einst"));
+$("k-start-wechseln").addEventListener("click", () => zeige("konten"));
+
+/* ======================================================================
+   Wort hinzufügen / bearbeiten
+   ====================================================================== */
+let bearbeiteId = null;
+function neuStarten() {
+  bearbeiteId = null;
+  $("neu-titel").textContent = "Neues Wort";
+  $("f-wort").value = "";
+  $("neu-schritt1").classList.remove("unsichtbar");
+  $("neu-schritt2").classList.add("unsichtbar");
+  $("k-loeschen-bearb").classList.add("unsichtbar");
+  zeige("neu");
+  setTimeout(() => $("f-wort").focus(), 50);
+}
+function formularFuellen(d) {
+  $("n-wort-anzeige").textContent = d.wort;
+  $("f-erkl").value = d.erklaerung || ""; $("f-kat").value = d.kategorie || ""; $("f-art").value = d.artikel || "";
+  $("f-reim").value = d.reim || ""; $("f-silben").value = d.silben || silbenZaehlen(d.wort);
+  pruefeWarnung();
+}
+$("k-weiter").addEventListener("click", wortWeiter);
+$("f-wort").addEventListener("keydown", e => { if (e.key === "Enter") wortWeiter(); });
+function wortWeiter() {
+  const wort = $("f-wort").value.trim().replace(/\s+/g, " ");
+  if (!wort) { $("f-wort").focus(); return; }
+  const doppelt = S.karten.find(k => normal(k.wort) === normal(wort));
+  const d = imWoerterbuch(wort);
+  $("neu-schritt1").classList.add("unsichtbar");
+  $("neu-schritt2").classList.remove("unsichtbar");
+  $("k-ki").classList.add("unsichtbar");
+  let hinweis;
+  if (d) {
+    formularFuellen({ wort: d.w, erklaerung: d.e, kategorie: d.k, artikel: d.a, reim: d.r, silben: d.s });
+    hinweis = "Die Erklärung kommt aus dem eingebauten Wörterbuch. Du kannst alles ändern.";
+  } else {
+    formularFuellen({ wort });
+    if (G.apiKey) { hinweis = "Dieses Wort kennt das Wörterbuch noch nicht. Die KI schreibt gleich eine Erklärung."; $("k-ki").classList.remove("unsichtbar"); kiHolen(); }
+    else hinweis = "Dieses Wort kennt das Wörterbuch noch nicht. Schreib bitte selbst 1 bis 2 Sätze dazu, oder lass dir helfen.";
+  }
+  if (doppelt) hinweis = "Hinweis: Dieses Wort steht schon in deiner Liste. " + hinweis;
+  $("n-quelle").textContent = hinweis;
+}
+function pruefeWarnung() { $("n-warn").classList.toggle("unsichtbar", !erklaerungEnthaeltWort($("f-erkl").value, $("n-wort-anzeige").textContent)); }
+$("f-erkl").addEventListener("input", pruefeWarnung);
+
+$("k-speichern").addEventListener("click", () => {
+  const wort = $("n-wort-anzeige").textContent.trim();
+  const erklaerung = $("f-erkl").value.trim();
+  if (!erklaerung) { $("f-erkl").focus(); $("n-quelle").textContent = "Bitte noch eine kurze Erklärung eintragen. Die siehst du dann beim Üben."; return; }
+  const daten = { wort, erklaerung, kategorie:$("f-kat").value, artikel:$("f-art").value, reim:$("f-reim").value, silben: parseInt($("f-silben").value,10) || silbenZaehlen(wort) };
+  if (bearbeiteId) {
+    const k = S.karten.find(x => x.id === bearbeiteId);
+    if (k) Object.assign(k, { erklaerung:daten.erklaerung.trim(), kategorie:daten.kategorie.trim(), artikel:daten.artikel.trim(), reim:daten.reim.trim(), silben:daten.silben });
+    sichern(); zeige("liste");
+  } else {
+    S.karten.push(karteAnlegen(daten)); sichern(); zeige("start");
+  }
+});
+$("k-loeschen-bearb").addEventListener("click", () => { if (bearbeiteId) loeschenFragen(bearbeiteId, $("k-loeschen-bearb")); });
+
+function bearbeiten(id) {
+  const k = S.karten.find(x => x.id === id); if (!k) return;
+  bearbeiteId = id;
+  $("neu-titel").textContent = "Wort bearbeiten";
+  $("neu-schritt1").classList.add("unsichtbar");
+  $("neu-schritt2").classList.remove("unsichtbar");
+  $("k-ki").classList.toggle("unsichtbar", !G.apiKey);
+  $("k-loeschen-bearb").classList.remove("unsichtbar");
+  $("n-quelle").textContent = "Hier kannst du Erklärung und Tipps ändern.";
+  formularFuellen(k);
+  zeige("neu");
+}
+function loeschenFragen(id, ort) {
+  const k = S.karten.find(x => x.id === id); if (!k) return;
+  bestaetigen(ort, "„" + k.wort + "“ wirklich löschen?", [{ text:"Ja, löschen", cls:"rot-voll", fn: () => {
+    S.karten = S.karten.filter(x => x.id !== id); sichern(); zeige("liste");
+  } }]);
+}
+
+/* KI-Erklärung über die Claude API (nur Test, Schlüssel lokal, gilt für alle Konten) */
+$("k-ki").addEventListener("click", kiHolen);
+async function kiHolen() {
+  const wort = $("n-wort-anzeige").textContent.trim();
+  const key = G.apiKey; if (!key || !wort) return;
+  const knopf = $("k-ki"); knopf.disabled = true; knopf.textContent = "KI schreibt ...";
+  const prompt = "Ein älterer Mensch übt mit Karteikarten Wörter, die ihm im Gespräch nicht mehr einfallen (Wortfindung üben). " +
+    "Schreibe für das Wort \"" + wort + "\" die Vorderseite der Karte.\n" +
+    "Regeln: erklaerung = 1 bis 2 kurze, einfache Sätze auf Deutsch, die beschreiben, was es ist oder wofür man es braucht, alltagsnah. " +
+    "Das Wort selbst und Teile davon dürfen NICHT vorkommen. Keine Gedankenstriche. Freundlich, nicht kindlich. " +
+    "Schreib unpersönlich mit „man“. Falls du die lernende Person doch ansprichst, dann mit „du“, nie mit „Sie“.\n" +
+    "kategorie = ein einzelnes Wort als Gruppe (z. B. Küche, Werkzeug, Medizin, Garten).\n" +
+    "artikel = der, die oder das (leer, wenn kein Nomen).\n" +
+    "reim = ein einfaches deutsches Wort, das sich auf das Wort oder auf seinen letzten Wortteil reimt.";
+  const schema = { type:"object", additionalProperties:false, required:["erklaerung","kategorie","artikel","reim"],
+    properties: { erklaerung:{type:"string"}, kategorie:{type:"string"}, artikel:{type:"string"}, reim:{type:"string"} } };
+  const basis = { model:"claude-sonnet-5-5", max_tokens:2000, output_config:{ effort:"low", format:{ type:"json_schema", schema } },
+    messages:[{ role:"user", content: prompt }] };
+  const kopf = { "content-type":"application/json", "x-api-key": key, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" };
+  try {
+    // Erst mit automatischer Ausweich-Option (Fallback), bei Ablehnung des Parameters ohne.
+    let r = await fetch("https://api.anthropic.com/v1/messages", { method:"POST",
+      headers: Object.assign({ "anthropic-beta":"server-side-fallback-2026-07-01" }, kopf), body: JSON.stringify(Object.assign({ fallbacks:"default" }, basis)) });
+    if (r.status === 400) r = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers: kopf, body: JSON.stringify(basis) });
+    const j = await r.json();
+    if (!r.ok) throw new Error((j.error && j.error.message) || ("Fehler " + r.status));
+    if (j.stop_reason === "refusal") throw new Error("Die KI hat zu diesem Wort keine Erklärung geschrieben.");
+    const text = (j.content || []).filter(b => b.type === "text").map(b => b.text).join("");
+    const m = text.match(/\{[\s\S]*\}/); if (!m) throw new Error("Antwort nicht lesbar.");
+    const d = JSON.parse(m[0]);
+    const erkl = String(d.erklaerung||"").replace(/\s*[\u2014\u2013]\s*/g, ", ");
+    formularFuellen({ wort, erklaerung: erkl, kategorie: d.kategorie, artikel: d.artikel, reim: d.reim, silben: silbenZaehlen(wort) });
+    $("n-quelle").textContent = "Die KI hat einen Vorschlag gemacht. Lies ihn kurz und ändere ihn, wenn nötig.";
+  } catch (e) {
+    $("n-quelle").textContent = "Die KI hat gerade nicht geantwortet (" + e.message + "). Trag die Erklärung bitte selbst ein.";
+  } finally { knopf.disabled = false; knopf.textContent = "Erklärung von der KI holen"; }
+}
+
+/* ======================================================================
+   Üben (Sitzung, Tipps, Punkte, Leitner-Plan)
+   ====================================================================== */
+let U = null; // laufende Sitzung
+const LOB_GUT = ["Wunderbar!", "Sehr gut!", "Genau richtig!", "Prima gemacht!", "Klasse!"];
+const LOB_MIT_TIPP = ["Richtig! Die Tipps haben geholfen, genau dafür sind sie da.", "Geschafft! Mit Tipps zählt es genauso.", "Richtig! Das Wort kommt bald noch einmal, dann geht es leichter."];
+const TROST = ["Kein Problem. Jetzt hast du es gesehen, das hilft schon.", "Macht nichts. Dieses Wort üben wir gleich noch einmal.", "Gut, dass du es versucht hast. Beim nächsten Mal klappt es besser."];
+
+function tippListe(k) {
+  const t = [];
+  t.push({ name:"Gruppe", text: (k.kategorie ? k.kategorie : "ein Ding") + (k.artikel ? ". Es heißt „" + k.artikel + " ...“" : "") });
+  t.push({ name:"Silben", text: k.silben + (k.silben === 1 ? " Silbe" : " Silben") });
+  t.push({ name:"Erster Buchstabe", text: k.wort.charAt(0).toUpperCase() });
+  if (k.reim) t.push({ name:"Klingt ähnlich wie", text: k.reim });
+  t.push({ name:"Letzter Buchstabe", text: k.wort.charAt(k.wort.length-1) });
+  t.push({ name:"So sieht es aus", text: lueckenWort(k.wort), luecke:true });
+  return t;
+}
+
+$("k-ueben").addEventListener("click", sitzungStarten);
+function sitzungStarten() {
+  const l = S.einstellungen.laenge || "k10";
+  const istZeit = l[0] === "m"; const wert = parseInt(l.slice(1), 10);
+  let faellig = faelligeKarten().sort((a,b) => a.fach - b.fach || (a.zuletzt||"").localeCompare(b.zuletzt||""));
+  let stapel = faellig.slice();
+  if (stapel.length < (istZeit ? 40 : wert)) { // Extra-Karten: am längsten nicht geübt
+    const rest = S.karten.filter(k => !stapel.includes(k)).sort((a,b) => (a.zuletzt||"").localeCompare(b.zuletzt||""));
+    stapel = stapel.concat(rest);
+  }
+  if (!istZeit) stapel = stapel.slice(0, wert);
+  if (!stapel.length) return;
+  U = { stapel: stapel.map(k => k.id), pos: 0, istZeit, ende: istZeit ? Date.now() + wert*60000 : 0, punkte:0, gezeigt:0, wiederholt:{}, ergebnisse:[] };
+  tag().sitzungen += 1; sichern();
+  zeige("ueben");
+  karteZeigen();
+}
+function aktuelleKarte() { return S.karten.find(k => k.id === U.stapel[U.pos]); }
+function karteZeigen() {
+  const k = aktuelleKarte();
+  if (!k) return sitzungEnde();
+  U.tipps = 0; U.liste = tippListe(k); U.fertig = false;
+  $("u-erkl").textContent = k.erklaerung;
+  $("u-tipps").innerHTML = "";
+  $("f-antwort").value = "";
+  $("u-frage").classList.remove("unsichtbar");
+  $("u-selbst").classList.add("unsichtbar");
+  $("u-ergebnis").classList.add("unsichtbar");
+  $("u-fortschritt").textContent = U.istZeit ? "Karte " + (U.gezeigt+1) + ", noch " + Math.max(0, Math.ceil((U.ende-Date.now())/60000)) + " Min." : "Karte " + (U.pos+1) + " von " + U.stapel.length;
+  $("u-punkte").textContent = U.punkte + " Punkte";
+  tippKnopf();
+}
+function tippKnopf() {
+  const rest = U.liste.length - U.tipps;
+  $("k-tipp").disabled = rest <= 0;
+  $("k-tipp").textContent = rest > 0 ? "Tipp bekommen (noch " + rest + ")" : "Keine Tipps mehr";
+}
+$("k-tipp").addEventListener("click", () => {
+  if (U.tipps >= U.liste.length) return;
+  const t = U.liste[U.tipps++];
+  const li = document.createElement("li");
+  li.innerHTML = "<b>" + esc(t.name) + ":</b> " + (t.luecke ? "<span class='luecke'>" + esc(t.text) + "</span>" : esc(t.text));
+  $("u-tipps").appendChild(li);
+  tippKnopf();
+});
+$("k-vorlesen").addEventListener("click", () => {
+  try { const k = aktuelleKarte(); if (!k || !window.speechSynthesis) return; speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(k.erklaerung); u.lang = "de-DE"; u.rate = 0.9; speechSynthesis.speak(u); } catch (e) {}
+});
+function punkteFuer(tipps) { return Math.max(10, 100 - tipps * TIPP_ABZUG); }
+
+$("k-pruefen").addEventListener("click", pruefen);
+$("f-antwort").addEventListener("keydown", e => { if (e.key === "Enter") pruefen(); });
+function pruefen() {
+  const k = aktuelleKarte(); const ein = $("f-antwort").value;
+  if (!ein.trim()) { $("f-antwort").focus(); return; }
+  const v = vergleiche(ein, k.wort);
+  if (v === "richtig") return abschliessen(k, "richtig", punkteFuer(U.tipps));
+  if (v === "fast") return abschliessen(k, "fast", Math.max(10, punkteFuer(U.tipps) - 10));
+  // Falsch: freundlich, nochmal versuchen lassen
+  $("f-antwort").value = "";
+  const li = document.createElement("li");
+  li.innerHTML = "<b>Noch nicht ganz.</b> „" + esc(ein.trim()) + "“ ist es nicht. Versuch es nochmal oder hol dir einen Tipp.";
+  li.style.background = "var(--blau-hell)";
+  $("u-tipps").appendChild(li);
+}
+$("k-weiss").addEventListener("click", () => {
+  const k = aktuelleKarte();
+  $("u-selbst-wort").textContent = k.wort;
+  $("u-frage").classList.add("unsichtbar");
+  $("u-selbst").classList.remove("unsichtbar");
+});
+$("k-selbst-ja").addEventListener("click", () => abschliessen(aktuelleKarte(), "richtig", punkteFuer(U.tipps)));
+$("k-selbst-nein").addEventListener("click", () => abschliessen(aktuelleKarte(), "falsch", 0));
+$("k-aufdecken").addEventListener("click", () => abschliessen(aktuelleKarte(), "falsch", 0));
+
+function abschliessen(k, ergebnis, punkte) {
+  if (U.fertig) return; U.fertig = true;
+  // Bewertung für den Plan
+  let guete;
+  if (ergebnis === "falsch") guete = "falsch";
+  else if (U.tipps <= 1 && ergebnis === "richtig") guete = "gut";
+  else if (U.tipps <= 3) guete = "mittel";
+  else guete = "schwer";
+  if (guete === "gut") k.fach = Math.min(6, k.fach + 1);
+  else if (guete === "mittel") k.fach = Math.max(1, k.fach);
+  else if (guete === "schwer") k.fach = Math.max(1, k.fach - 1);
+  else k.fach = 1;
+  k.faellig = guete === "falsch" ? heute() : (guete === "schwer" ? plusTage(1) : plusTage(ABSTAENDE[k.fach]));
+  k.versuche += 1; if (ergebnis !== "falsch") k.richtig += 1;
+  k.letztePunkte = (k.letztePunkte || []).concat(punkte).slice(-5);
+  k.zuletzt = new Date().toISOString();
+  const t = tag(); t.punkte += punkte; t.karten += 1;
+  sichern();
+  U.punkte += punkte; U.gezeigt += 1; U.ergebnisse.push({ wort:k.wort, punkte });
+  // Schwere Wörter in dieser Sitzung noch einmal (höchstens 2-mal)
+  if ((guete === "falsch" || guete === "schwer") && (U.wiederholt[k.id] || 0) < 2) {
+    U.wiederholt[k.id] = (U.wiederholt[k.id] || 0) + 1;
+    U.stapel.splice(Math.min(U.stapel.length, U.pos + 4), 0, k.id);
+  }
+  // Rückmeldung, ab und zu mit Namen
+  let text, cls;
+  if (ergebnis === "richtig") { text = mitName(U.tipps === 0 ? zufall(LOB_GUT) : zufall(LOB_MIT_TIPP)); cls = "gut"; }
+  else if (ergebnis === "fast") { text = mitName("Fast richtig! Geschrieben wird es so: " + k.wort); cls = "gut"; }
+  else { text = mitName(zufall(TROST), 0.25); cls = "mittel"; }
+  $("u-loesung").textContent = (k.artikel ? k.artikel + " " : "") + k.wort;
+  $("u-rueck").className = "rueckmeldung " + cls;
+  $("u-rueck").innerHTML = esc(text) + (punkte > 0 ? "<span class='punkte'>+" + punkte + " Punkte</span>" : "");
+  $("u-punkte").textContent = U.punkte + " Punkte";
+  $("u-frage").classList.add("unsichtbar"); $("u-selbst").classList.add("unsichtbar");
+  $("u-ergebnis").classList.remove("unsichtbar");
+  const weiter = U.istZeit ? Date.now() < U.ende : U.pos + 1 < U.stapel.length;
+  $("k-naechste").textContent = weiter ? "Nächste Karte" : "Fertig";
+}
+$("k-naechste").addEventListener("click", () => {
+  U.pos += 1;
+  if ((U.istZeit && Date.now() >= U.ende) || U.pos >= U.stapel.length) return sitzungEnde();
+  karteZeigen();
+});
+$("k-ueben-ende").addEventListener("click", sitzungEnde);
+function sitzungEnde() {
+  if (!U) return zeige("start");
+  const n = U.ergebnisse.length;
+  const gekonnt = U.ergebnisse.filter(e => e.punkte > 0).length;
+  $("fertig-titel").textContent = n === 0 ? "Bis bald, " + K.name + "!" : "Geschafft, " + K.name + "!";
+  $("fertig-text").innerHTML = n === 0 ? "<p>Heute nichts geübt. Das ist in Ordnung, beim nächsten Mal geht es weiter.</p>"
+    : "<p><b>" + n + "</b> Karten geübt, davon <b>" + gekonnt + "</b> gefunden.</p><p class='punkte' style='color:var(--blau)'>" + U.punkte + " Punkte</p>" +
+      "<p>" + (tag().sitzungen >= 2 ? "Das war schon die " + tag().sitzungen + ". Sitzung heute. Toll!" : "Wenn du magst: später am Tag noch eine kurze Runde.") + "</p>";
+  U = null;
+  zeige("fertig");
+}
+
+/* ======================================================================
+   Wortliste
+   ====================================================================== */
+function listeZeichnen() {
+  const karten = S.karten.slice().sort((a,b) => a.wort.localeCompare(b.wort, "de"));
+  $("liste-anzahl").textContent = "(" + karten.length + ")";
+  $("wortliste").innerHTML = karten.length ? karten.map(k => {
+    const s = stand(k);
+    const info = k.versuche ? k.richtig + " von " + k.versuche + " gefunden" + (k.faellig <= heute() ? ", heute dran" : ", wieder dran am " + k.faellig.split("-").reverse().join(".")) : "noch nicht geübt";
+    return "<li><div class='kopf'><span class='wort'>" + esc(k.wort) + "</span><span class='stand " + s.cls + "'>" + s.text + "</span></div>" +
+      "<div class='leise klein-text'>" + esc(info) + "</div>" +
+      "<button class='klein' data-bearb='" + esc(k.id) + "'>Bearbeiten</button><button class='klein leise-knopf' data-loesch='" + esc(k.id) + "'>Löschen</button></li>";
+  }).join("") : "<li class='leise'>Noch keine Wörter.</li>";
+}
+$("wortliste").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.closest("#bestaetigung")) return;
+  if (b.dataset.bearb) bearbeiten(b.dataset.bearb);
+  if (b.dataset.loesch) loeschenFragen(b.dataset.loesch, b);
+});
+
+/* ======================================================================
+   Einstellungen: Konto, Sicherung, Schlüssel, Zurücksetzen
+   ====================================================================== */
+function meldung(t, ort) {
+  const m = $("einst-meldung"); m.textContent = t; m.classList.remove("unsichtbar");
+  if (ort) ort.insertAdjacentElement("afterend", m);
+}
+function einstZeichnen() {
+  $("e-name").textContent = K.name;
+  $("f-key").value = G.apiKey || "";
+  $("einst-meldung").classList.add("unsichtbar");
+  $("name-aendern").classList.add("unsichtbar"); $("k-name").classList.remove("unsichtbar");
+  $("k-export").textContent = "Sicherung für " + K.name + " speichern";
+  $("k-export-alle").textContent = "Alle Konten sichern (" + G.konten.length + ")";
+  $("k-export-alle").classList.toggle("unsichtbar", G.konten.length < 2);
+}
+
+/* ---------- Konto ---------- */
+$("k-name").addEventListener("click", () => {
+  $("name-aendern").classList.remove("unsichtbar"); $("k-name").classList.add("unsichtbar");
+  $("f-neuname").value = K.name; $("f-neuname").focus();
+});
+$("k-name-abbrechen").addEventListener("click", () => { $("name-aendern").classList.add("unsichtbar"); $("k-name").classList.remove("unsichtbar"); });
+$("f-neuname").addEventListener("keydown", e => { if (e.key === "Enter") nameSpeichern(); });
+$("k-name-speichern").addEventListener("click", nameSpeichern);
+function nameSpeichern() {
+  const name = sauber($("f-neuname").value);
+  if (!name) { $("f-neuname").focus(); return; }
+  if (nameVergeben(name, K)) { meldung("Den Namen „" + name + "“ gibt es hier schon.", $("name-aendern")); return; }
+  K.name = name; sichern(); einstZeichnen();
+  meldung("Gespeichert. Ab jetzt heißt du hier " + name + ".", $("e-name").parentElement);
+}
+$("k-wechseln").addEventListener("click", () => zeige("konten"));
+$("k-konto-loeschen").addEventListener("click", () => {
+  const n = K.daten.karten.length;
+  bestaetigen($("k-konto-loeschen"), "Das Konto „" + K.name + "“ wirklich löschen? Alle " + n + " Wörter, Punkte und Tage in Folge sind dann weg. Tipp: Vorher eine Sicherung speichern.",
+    [{ text:"Ja, Konto löschen", cls:"rot-voll", fn: kontoLoeschen }]);
+});
+function kontoLoeschen() {
+  const name = K.name;
+  G.konten = G.konten.filter(k => k !== K); K = null; S = null; G.aktiv = null; sichern();
+  if (!G.konten.length) return willkommenZeigen("erst");
+  if (G.konten.length === 1) { kontoWaehlen(G.konten[0].id); zeige("start"); return; }
+  kontenMeldung = "Das Konto „" + name + "“ wurde gelöscht.";
+  zeige("konten");
+}
+
+/* ---------- Sicherung ---------- */
+function dateiTeil(name) { return String(name).trim().replace(/\s+/g, "-").replace(/[^\p{L}\p{N}-]/gu, "") || "Konto"; }
+function kontoFuerDatei(k) { return { id:k.id, name:k.name, angelegt:k.angelegt, daten:k.daten }; }
+async function dateiAusgeben(dateiname, objekt, ort) {
+  const text = JSON.stringify(objekt, null, 2);
+  // iPhone: Teilen-Fenster ("In Dateien sichern", z. B. iCloud Drive). Sonst normaler Download.
+  try {
+    const datei = new File([text], dateiname, { type:"application/json" });
+    if (navigator.canShare && navigator.share && navigator.canShare({ files:[datei] })) {
+      await navigator.share({ files:[datei], title: dateiname });
+      meldung("Sicherung „" + dateiname + "“ ist fertig. Am besten in iCloud Drive ablegen.", ort); return;
+    }
+  } catch (e) { if (e && e.name === "AbortError") { meldung("Sicherung abgebrochen.", ort); return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type:"application/json" })); a.download = dateiname;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  meldung("Sicherung „" + dateiname + "“ gespeichert (App „Dateien“, Ordner Downloads). Am besten nach iCloud Drive verschieben.", ort);
+}
+$("k-export").addEventListener("click", () => {
+  dateiAusgeben("wortschatz-" + dateiTeil(K.name) + "-" + heute() + ".json",
+    { art:"wortschatz-konto", version:2, gesichert:new Date().toISOString(), konto: kontoFuerDatei(K) }, $("k-export"));
+});
+$("k-export-alle").addEventListener("click", () => {
+  dateiAusgeben("wortschatz-alle-Konten-" + heute() + ".json",
+    { art:"wortschatz-alle", version:2, gesichert:new Date().toISOString(), konten: G.konten.map(kontoFuerDatei) }, $("k-export-alle"));
+});
+$("k-import").addEventListener("click", () => { bestaetigungSchliessen(); $("f-import").click(); });
+$("f-import").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  const ort = $("k-import");
+  let d;
+  try { d = JSON.parse(await f.text()); } catch (err) { d = null; }
+  if (d && d.art === "wortschatz-alle" && Array.isArray(d.konten)) return alleLadenFragen(d.konten.map(kontoPruefen), ort);
+  let imp = null;
+  if (d && d.art === "wortschatz-konto" && d.konto) imp = kontoPruefen(d.konto);
+  else if (d && Array.isArray(d.karten)) imp = { id:null, name:"", daten: datenPruefen(d) }; // Sicherung aus Prototyp 0.1
+  if (!imp) return meldung("Diese Datei konnte nicht gelesen werden. Bitte eine Wortschatz-Sicherung wählen.", ort);
+  const n = imp.daten.karten.length;
+  const von = imp.name ? " von „" + imp.name + "“" : "";
+  const optionen = [{ text:"In mein Konto laden (ersetzt meine " + S.karten.length + " Wörter)", cls:"rot", fn: () => {
+    datenSetzen(K, imp.daten); sichern(); einstZeichnen(); meldung("Sicherung geladen: " + n + " Wörter.", ort);
+  } }, { text:"Als neues Konto anlegen", cls:"", fn: () => {
+    const k = kontoAnlegen(freierName(imp.name || "Neues Konto"), imp.daten); sichern(); einstZeichnen();
+    meldung("Neues Konto „" + k.name + "“ mit " + n + " Wörtern angelegt. Zum Üben: Konto wechseln.", ort);
+  } }];
+  bestaetigen(ort, "Sicherung" + von + " mit " + n + (n === 1 ? " Wort" : " Wörtern") + " gefunden. Was soll damit passieren?", optionen, true);
+});
+function alleLadenFragen(konten, ort) {
+  konten.forEach(k => { if (!k.name) k.name = "Ohne Namen"; });
+  const namen = konten.map(k => k.name).join(", ");
+  bestaetigen(ort, "Sicherung mit " + konten.length + " Konten gefunden (" + namen + "). Konten, die es hier schon gibt, werden durch die Sicherung ersetzt. Die anderen kommen dazu.",
+    [{ text:"Alle Konten laden", cls:"haupt", fn: () => {
+      let neu = 0, ersetzt = 0;
+      konten.forEach(imp => {
+        const da = G.konten.find(k => k.id === imp.id) || G.konten.find(k => k.name.toLowerCase() === imp.name.toLowerCase());
+        if (da) { da.name = nameVergeben(imp.name, da) ? da.name : imp.name; datenSetzen(da, imp.daten); ersetzt++; }
+        else { G.konten.push({ id: G.konten.some(k => k.id === imp.id) ? neueId() : imp.id, name: freierName(imp.name), angelegt: imp.angelegt, daten: imp.daten }); neu++; }
+      });
+      sichern(); einstZeichnen();
+      meldung("Sicherung geladen: " + ersetzt + " Konten ersetzt, " + neu + " neu dazu.", ort);
+    } }], true);
+}
+$("k-key").addEventListener("click", () => { G.apiKey = $("f-key").value.trim(); sichern(); meldung(G.apiKey ? "Schlüssel gespeichert (gilt für alle Konten)." : "Schlüssel entfernt.", $("k-key")); });
+$("k-reset").addEventListener("click", () => {
+  bestaetigen($("k-reset"), "Wirklich alle Wörter und Punkte von " + K.name + " löschen? Das kann man nicht rückgängig machen. Das Konto selbst bleibt.",
+    [{ text:"Ja, alles löschen", cls:"rot-voll", fn: () => { datenSetzen(K, leereDaten()); sichern(); zeige("start"); } }]);
+});
+
+/* ======================================================================
+   Start
+   ====================================================================== */
+if (G.aktiv && G.konten.length > 1) G.aktiv = null; // bei mehreren Konten beim Start immer fragen, wer übt
+appStart();
+if (!speicherOk) document.querySelector("main").insertAdjacentHTML("afterbegin", "<p class='warnung'>Dieser Browser erlaubt kein Speichern. Die Wörter gehen beim Schließen verloren. Bitte Safari normal (nicht privat) benutzen.</p>");
+</script>
+</body>
+</html>
