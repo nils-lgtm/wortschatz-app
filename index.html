@@ -122,6 +122,47 @@
   .zeile { display: flex; gap: 8px; }
   .zeile > * { flex: 1; }
   .unsichtbar { display: none !important; }
+  #n-alternativen { margin: 8px 0; }
+  #n-alternativen button[aria-pressed="true"] { background: var(--blau); color: #fff; border-color: var(--blau); }
+
+  /* Bilder */
+  .bildrahmen { margin: 0 0 12px; text-align: center; }
+  .bildrahmen img { display: block; margin: 0 auto; max-width: 100%; max-height: 30vh; border-radius: 12px; object-fit: contain; background: #fff; }
+  .bildrahmen figcaption { font-size: 14px; color: var(--leise); margin-top: 4px; }
+  .bild-knoepfe { display: flex; flex-wrap: wrap; gap: 0 8px; }
+  .bild-knoepfe button { flex: 1 1 45%; }
+  button.mit-symbol { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  button.mit-symbol svg { width: 28px; height: 28px; flex: none; }
+
+  /* Mikrofon-Knopf (wie Sprachnachricht) */
+  .mikro-zeile { display: flex; flex-direction: column; align-items: center; margin: 14px 0 6px; }
+  button.mikro { width: 92px; height: 92px; min-height: 92px; border-radius: 50%; padding: 0; margin: 0;
+    background: #128C7E; border: none; color: #fff; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,.28); }
+  button.mikro svg { width: 46px; height: 46px; }
+  button.mikro.hoert { background: #C62828; animation: puls 1.2s ease-out infinite; }
+  @keyframes puls { 0% { box-shadow: 0 0 0 0 rgba(198,40,40,.55); } 70% { box-shadow: 0 0 0 24px rgba(198,40,40,0); } 100% { box-shadow: 0 0 0 0 rgba(198,40,40,0); } }
+  .mikro-text { font-size: 19px; font-weight: 600; color: var(--leise); margin-top: 8px; text-align: center; }
+  .mikro-text.hoert { color: #C62828; }
+
+  /* Vorschläge */
+  .vorschlag-gruppe { font-size: 18px; color: var(--leise); margin: 14px 0 2px; font-weight: 600; }
+  button.vorschlag { display: flex; gap: 14px; align-items: flex-start; text-align: left; font-weight: 500;
+    border: 3px solid var(--linie); color: var(--text); min-height: 84px; }
+  button.vorschlag[aria-pressed="true"] { border-color: var(--gruen); background: var(--gruen-hell); }
+  .haken { flex: 0 0 42px; height: 42px; border-radius: 50%; border: 3px solid var(--linie); background: #fff;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .haken svg { width: 26px; height: 26px; visibility: hidden; }
+  button.vorschlag[aria-pressed="true"] .haken { background: var(--gruen); border-color: var(--gruen); }
+  button.vorschlag[aria-pressed="true"] .haken svg { visibility: visible; }
+  .v-wort { display: block; font-size: 24px; font-weight: 700; }
+  .v-erkl { display: block; font-size: 18px; color: var(--leise); line-height: 1.35; margin-top: 2px; }
+
+  /* Schalter in den Einstellungen */
+  button.schalter { display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: left;
+    border-color: var(--linie); color: var(--text); font-weight: 500; }
+  .an-aus { flex: none; font-size: 18px; font-weight: 700; padding: 6px 14px; border-radius: 999px; background: var(--linie); color: var(--text); }
+  button.schalter[aria-pressed="true"] .an-aus { background: var(--gruen); color: #fff; }
 </style>
 </head>
 <body>
@@ -178,6 +219,8 @@
   </div>
 
   <button id="k-neu">+ Neues Wort eintragen</button>
+  <button id="k-foto-ding" class="mit-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="4"/></svg>Foto von einem Ding</button>
+  <input type="file" id="f-foto-ding" accept="image/*" capture="environment" class="unsichtbar">
 
   <div id="schwer-block" class="unsichtbar">
     <h2>Diese Wörter fallen dir noch schwer</h2>
@@ -199,11 +242,18 @@
     <label for="f-wort">Welches Wort willst du üben?</label>
     <input type="text" id="f-wort" autocomplete="off" autocapitalize="sentences" spellcheck="true" placeholder="zum Beispiel: Spritze">
     <p class="leise klein-text">Du kannst auch das Mikrofon auf der Tastatur benutzen und das Wort sagen.</p>
+    <figure id="n-foto-vorschau" class="bildrahmen unsichtbar"><img id="n-foto-img" alt="Dein Foto"><figcaption>Bild: eigenes Foto</figcaption></figure>
+    <p id="n-foto-hinweis" class="hinweis unsichtbar"></p>
     <button class="haupt" id="k-weiter">Weiter</button>
+    <p id="n-oder" class="leise" style="text-align:center;margin:14px 0 0">oder</p>
+    <button id="k-foto-ding2" class="mit-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="4"/></svg>Foto von einem Ding</button>
   </div>
   <div id="neu-schritt2" class="unsichtbar">
-    <div class="kasten" style="text-align:center"><span class="leise klein-text">Das Wort</span><div class="loesung" id="n-wort-anzeige"></div></div>
+    <div class="kasten" style="text-align:center"><span class="leise klein-text">Das Wort</span><div class="loesung" id="n-wort-anzeige"></div>
+      <figure id="n-bild" class="bildrahmen unsichtbar" style="margin-bottom:0"><img id="n-bild-img" alt="Bild zum Wort"><figcaption id="n-bild-quelle"></figcaption></figure></div>
     <p id="n-quelle" class="hinweis"></p>
+    <div id="n-alternativen" class="unsichtbar"></div>
+    <button class="leise-knopf unsichtbar" id="k-wort-aendern" type="button">Anderes Wort eintippen</button>
     <button id="k-ki" class="unsichtbar">Erklärung von der KI holen</button>
     <label for="f-erkl">Erklärung (die siehst du beim Üben)</label>
     <textarea id="f-erkl" placeholder="Beschreib in 1 bis 2 Sätzen, was das ist. Das Wort selbst nicht verwenden."></textarea>
@@ -216,6 +266,17 @@
     </div>
     <label for="f-reim">Reimwort (klingt ähnlich)</label>
     <input type="text" id="f-reim" autocomplete="off">
+
+    <label>Bild (erscheint beim Üben)</label>
+    <p id="n-bild-info" class="leise klein-text"></p>
+    <button id="k-foto" class="mit-symbol" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="4"/></svg>Eigenes Foto</button>
+    <input type="file" id="f-foto" accept="image/*" capture="environment" class="unsichtbar">
+    <div class="bild-knoepfe">
+      <button class="leise-knopf unsichtbar" id="k-bild-zeichnen" type="button">Zeichnen lassen</button>
+      <button class="leise-knopf" id="k-bild-anders" type="button">Anderes Bild</button>
+      <button class="leise-knopf rot" id="k-bild-weg" type="button">Bild entfernen</button>
+    </div>
+
     <button class="gruen" id="k-speichern" style="margin-top:20px">Speichern</button>
     <button class="leise-knopf rot unsichtbar" id="k-loeschen-bearb">Wort löschen</button>
   </div>
@@ -226,6 +287,7 @@
   <button class="zurueck" id="k-ueben-ende">‹ Beenden</button>
   <div class="fortschritt"><span id="u-fortschritt">Karte 1</span><span id="u-punkte">0 Punkte</span></div>
   <div class="uebkarte">
+    <figure id="u-bild" class="bildrahmen unsichtbar"><img id="u-bild-img" alt="Bild zum gesuchten Wort"><figcaption id="u-bild-quelle"></figcaption></figure>
     <div class="leise klein-text">Welches Wort ist gemeint?</div>
     <div class="erkl" id="u-erkl"></div>
     <button class="leise-knopf klein" id="k-vorlesen" type="button">Vorlesen</button>
@@ -235,6 +297,11 @@
   <div id="u-frage">
     <label for="f-antwort" style="margin-top:4px">Deine Antwort</label>
     <input type="text" id="f-antwort" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" placeholder="Wort tippen oder laut sagen">
+    <div class="mikro-zeile">
+      <button class="mikro" id="k-mikro" type="button" aria-label="Wort sagen"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 18v3.5M8.5 21.5h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <div class="mikro-text" id="u-mikro-text">Antippen und Wort sagen</div>
+    </div>
+    <p id="u-mikro-hinweis" class="hinweis unsichtbar"></p>
     <button class="haupt" id="k-pruefen">Prüfen</button>
     <button class="gruen" id="k-weiss">Ich weiß es (laut gesagt)</button>
     <button id="k-tipp">Tipp bekommen</button>
@@ -262,6 +329,14 @@
   <h1 id="fertig-titel">Geschafft!</h1>
   <div class="kasten" id="fertig-text"></div>
   <button class="haupt" data-zu="start">Zur Startseite</button>
+  <div id="fertig-vorschlaege" class="kasten unsichtbar"></div>
+</section>
+
+<!-- ============ ÄHNLICHE WÖRTER ============ -->
+<section id="v-aehnlich" class="ansicht" aria-label="Ähnliche Wörter">
+  <button class="zurueck" data-zu="liste">‹ Zurück</button>
+  <h1 id="aehnlich-titel">Ähnliche Wörter</h1>
+  <div id="aehnlich-vorschlaege" class="kasten"></div>
 </section>
 
 <!-- ============ WORTLISTE ============ -->
@@ -298,8 +373,18 @@
   <button class="leise-knopf" id="k-import">Sicherung laden</button>
   <input type="file" id="f-import" accept="application/json,.json" class="unsichtbar">
 
-  <h2>KI-Erklärungen (nur zum Testen)</h2>
-  <p class="klein-text">Für Wörter, die nicht im eingebauten Wörterbuch stehen, kann die KI von Anthropic (Claude) eine Erklärung schreiben. Dafür braucht es einen API-Schlüssel. Er gilt für alle Konten auf diesem Gerät.</p>
+  <h2>Bilder</h2>
+  <p style="margin-bottom:6px"><b>Welche Bilder?</b></p>
+  <div class="wahl" id="bildart-wahl">
+    <button data-b="zeichnung">Zeichnung</button>
+    <button data-b="foto">Foto (Wikipedia)</button>
+  </div>
+  <button class="schalter" id="k-bilder" aria-pressed="true"><span>Bilder in der Übung zeigen</span><span class="an-aus">An</span></button>
+  <button class="schalter" id="k-bild-tipp" aria-pressed="false"><span>Bild erst als Tipp zeigen</span><span class="an-aus">Aus</span></button>
+  <p class="leise klein-text">Die Bilder sind Zeichnungen, Fotos von Wikipedia oder deine eigenen Fotos. Ein eigenes Foto geht immer vor. Eigene Fotos bleiben nur auf diesem iPhone und sind nicht in der Sicherung.</p>
+
+  <h2>KI-Erklärungen und Wortvorschläge (nur zum Testen)</h2>
+  <p class="klein-text">Für Wörter, die nicht im eingebauten Wörterbuch stehen, kann die KI von Anthropic (Claude) eine Erklärung schreiben. Nach einer Übung schlägt sie dir außerdem passende neue Wörter vor. Dafür braucht es einen API-Schlüssel. Er gilt für alle Konten auf diesem Gerät.</p>
   <p class="warnung klein-text">Nur für den Test: Der Schlüssel bleibt auf diesem Gerät, steht aber ungeschützt im Browser. In der echten App läuft das über einen eigenen Server.</p>
   <label for="f-key">API-Schlüssel</label>
   <input type="password" id="f-key" autocomplete="off" placeholder="sk-ant-...">
@@ -308,7 +393,7 @@
   <h2>Neu anfangen</h2>
   <button class="leise-knopf rot" id="k-reset">Alle Wörter und Punkte dieses Kontos löschen</button>
   <p id="einst-meldung" class="hinweis unsichtbar"></p>
-  <p class="leise klein-text" style="margin-top:20px">Wortschatz, Prototyp 0.2</p>
+  <p class="leise klein-text" style="margin-top:20px">Wortschatz, Prototyp 0.3</p>
 </section>
 
 </main>
@@ -391,6 +476,95 @@ const WOERTERBUCH = [
 const BEISPIEL_WOERTER = ["Spritze","Gießkanne","Schraubenzieher","Thermometer","Briefmarke","Pflaster","Fernbedienung","Kleiderbügel","Wäscheklammer","Korkenzieher"];
 
 /* ======================================================================
+   Cartoon-Zeichnungen für die Startwörter (eigene SVGs, ohne Text).
+   Einheitlicher Stil: heller Hintergrundkreis, dunkle Umrisslinie 4px, flache Farben.
+   Gespeichert ist nur der Inhalt, der Rahmen kommt aus zeichnungSvg().
+   ====================================================================== */
+const ZLINIE = "#2B2B2B";
+const ZBG = { Medizin:"#FDE4E4", Garten:"#E3F2DF", Werkzeug:"#FFF0D2", "Küche":"#FCE9D6", Haushalt:"#E6EEF9", Post:"#FFF6CC",
+  Wohnzimmer:"#EDE7F6", Kleidung:"#DDF1EF", Schlafzimmer:"#E8EAF6", Haus:"#F1EDE6", Alltag:"#FFF0DC", Badezimmer:"#E1F5FE",
+  "Büro":"#ECEFF1", Freizeit:"#E6F4E7", Unterwegs:"#FFF6D9" };
+function zeichnungSvg(inner, bg) {
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="94" fill="' + (bg || "#EEF3F8") + '"/>' +
+    '<g stroke="' + ZLINIE + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' + inner + '</g></svg>';
+}
+const SAEGEZAHN = "l3 8l3 -8".repeat(21);
+const SCHLUESSEL = (w, farbe) => `<g transform="rotate(${w} 80 70)"><rect x="76" y="106" width="8" height="54" fill="${farbe}"/><path d="M84 138h9v7h-9M84 150h11v7h-11" fill="${farbe}"/><circle cx="80" cy="96" r="14" fill="${farbe}"/><circle cx="80" cy="92" r="4" fill="#FFF"/></g>`;
+const ZEICHNUNGEN = {
+  "Spritze": `<g transform="rotate(-35 100 100)"><rect x="22" y="84" width="10" height="32" rx="3" fill="#B0BEC5"/><path d="M32 100h24" fill="none"/><rect x="55" y="84" width="82" height="32" rx="5" fill="#E3F4FD"/><rect x="92" y="88" width="45" height="24" fill="#4FC3F7" stroke="none"/><rect x="51" y="74" width="7" height="52" rx="3" fill="#FFF"/><path d="M72 84v9M86 84v9M100 84v9M114 84v9" fill="none" stroke-width="3"/><path d="M137 93l12 4v6l-12 4z" fill="#CFD8DC"/><path d="M149 100h32" fill="none" stroke-width="3"/></g>`,
+  "Gießkanne": `<path d="M126 138l46-62 9 7-49 70z" fill="#43A047"/><ellipse cx="178" cy="78" rx="13" ry="7" transform="rotate(-55 178 78)" fill="#66BB6A"/><path d="M52 84q-2-44 44-42 32 2 26 42" fill="none" stroke-width="9"/><path d="M52 84q-2-44 44-42 32 2 26 42" fill="none" stroke="#66BB6A" stroke-width="3"/><rect x="36" y="80" width="96" height="80" rx="10" fill="#43A047"/><path d="M36 100h96" fill="none" stroke="#2E7D32"/><g fill="#4FC3F7" stroke="none"><circle cx="184" cy="98" r="4"/><circle cx="174" cy="108" r="4"/><circle cx="186" cy="114" r="3"/></g>`,
+  "Schraubenzieher": `<g transform="rotate(-40 100 100)"><rect x="82" y="94" width="78" height="12" fill="#B0BEC5"/><path d="M160 94l16 4v4l-16 4z" fill="#90A4AE"/><rect x="22" y="80" width="64" height="40" rx="16" fill="#E53935"/><path d="M38 88v24M54 88v24M70 88v24" fill="none" stroke="#B71C1C"/></g>`,
+  "Thermometer": `<rect x="86" y="26" width="28" height="118" rx="14" fill="#FFF"/><rect x="95" y="70" width="10" height="80" fill="#E53935" stroke="none"/><circle cx="100" cy="152" r="22" fill="#E53935"/><path d="M114 48h-9M114 62h-9M114 76h-9M114 90h-9M114 104h-9M114 118h-9" fill="none" stroke-width="3"/><circle cx="94" cy="146" r="5" fill="#FFAB91" stroke="none"/>`,
+  "Briefmarke": `<rect x="50" y="42" width="100" height="116" fill="#FFF"/><rect x="50" y="42" width="100" height="116" fill="none" stroke="#FFF6CC" stroke-width="10" stroke-dasharray="6 7"/><rect x="62" y="56" width="76" height="72" fill="#81D4FA"/><circle cx="118" cy="76" r="10" fill="#FFD54F"/><path d="M62 128v-18q20-22 40-6 18-14 36 4v20z" fill="#66BB6A"/><path d="M66 142h30M66 150h18" fill="none" stroke="#E53935" stroke-width="5"/>`,
+  "Pflaster": `<g transform="rotate(-30 100 100)"><rect x="24" y="76" width="152" height="48" rx="24" fill="#F0B98D"/><rect x="76" y="82" width="48" height="36" rx="5" fill="#FBE3CC"/><g fill="#D39B6E" stroke="none"><circle cx="44" cy="92" r="3"/><circle cx="56" cy="108" r="3"/><circle cx="44" cy="108" r="3"/><circle cx="56" cy="92" r="3"/><circle cx="144" cy="92" r="3"/><circle cx="156" cy="108" r="3"/><circle cx="144" cy="108" r="3"/><circle cx="156" cy="92" r="3"/></g></g>`,
+  "Fernbedienung": `<rect x="68" y="24" width="64" height="152" rx="18" fill="#546E7A"/><circle cx="100" cy="46" r="9" fill="#E53935"/><circle cx="100" cy="84" r="17" fill="#90A4AE"/><circle cx="100" cy="84" r="6" fill="#CFD8DC"/><g fill="#CFD8DC"><rect x="78" y="112" width="12" height="10" rx="3"/><rect x="94" y="112" width="12" height="10" rx="3"/><rect x="110" y="112" width="12" height="10" rx="3"/><rect x="78" y="130" width="12" height="10" rx="3"/><rect x="94" y="130" width="12" height="10" rx="3"/><rect x="110" y="130" width="12" height="10" rx="3"/><rect x="78" y="148" width="12" height="10" rx="3"/><rect x="94" y="148" width="12" height="10" rx="3"/><rect x="110" y="148" width="12" height="10" rx="3"/></g>`,
+  "Kleiderbügel": `<path d="M100 70V58a13 13 0 1 1 13-13" fill="none" stroke-width="6"/><path d="M100 66L26 128q-6 8 6 8h136q12 0 6-8zM100 86l-48 38h96z" fill="#C68A4E" fill-rule="evenodd"/>`,
+  "Wäscheklammer": `<path d="M20 52q80 14 160 0" fill="none" stroke="#8D6E63" stroke-width="5"/><path d="M70 60h60l-6 40q20 30 10 70H66q-10-40 10-70z" fill="#F48FB1"/><g transform="rotate(4 100 100)"><rect x="84" y="36" width="15" height="110" rx="6" fill="#E0B07A"/><rect x="101" y="36" width="15" height="110" rx="6" fill="#E0B07A"/><rect x="80" y="76" width="40" height="12" rx="5" fill="#B0BEC5"/></g>`,
+  "Korkenzieher": `<rect x="50" y="34" width="100" height="22" rx="11" fill="#A1673A"/><rect x="94" y="56" width="12" height="24" fill="#B0BEC5"/><path d="M100 80q18 6 0 12q-18 6 0 12q18 6 0 12q-18 6 0 12q18 6 0 12q-18 6 0 12v10" fill="none" stroke="#78909C" stroke-width="7"/><path d="M100 80q18 6 0 12q-18 6 0 12q18 6 0 12q-18 6 0 12q18 6 0 12q-18 6 0 12v10" fill="none" stroke="#CFD8DC" stroke-width="3"/>`,
+  "Dosenöffner": `<rect x="44" y="104" width="96" height="68" fill="#CFD8DC"/><rect x="44" y="118" width="96" height="38" fill="#EF5350"/><ellipse cx="92" cy="104" rx="48" ry="12" fill="#ECEFF1"/><g transform="rotate(-25 110 80)"><rect x="106" y="62" width="76" height="15" rx="7" fill="#FFB300"/><rect x="106" y="80" width="76" height="15" rx="7" fill="#FFB300"/><circle cx="104" cy="79" r="13" fill="#B0BEC5"/><ellipse cx="96" cy="58" rx="12" ry="7" fill="#78909C"/><path d="M100 64l3 10" fill="none"/></g>`,
+  "Nudelholz": `<ellipse cx="100" cy="150" rx="66" ry="16" fill="#FFE9B8"/><g transform="rotate(-15 100 100)"><rect x="18" y="92" width="34" height="16" rx="8" fill="#C68A4E"/><rect x="148" y="92" width="34" height="16" rx="8" fill="#C68A4E"/><rect x="50" y="80" width="100" height="40" rx="12" fill="#E8B27A"/><path d="M68 92q20-4 40 2M80 108q24 4 50-2" fill="none" stroke="#C68A4E" stroke-width="3"/></g>`,
+  "Schneebesen": `<g transform="rotate(-20 100 100)"><path d="M100 118C56 84 68 22 100 22s44 62 0 96M100 118C76 84 82 22 100 22s24 62 0 96M100 118V22" fill="none" stroke="#90A4AE" stroke-width="5"/><rect x="91" y="114" width="18" height="66" rx="9" fill="#E53935"/><circle cx="100" cy="170" r="3" fill="#FFF"/></g>`,
+  "Sieb": `<rect x="150" y="84" width="40" height="12" rx="6" fill="#455A64"/><path d="M30 90h124a62 58 0 0 1-124 0z" fill="#CFD8DC"/><g fill="#78909C" stroke="none"><circle cx="70" cy="108" r="4"/><circle cx="90" cy="108" r="4"/><circle cx="110" cy="108" r="4"/><circle cx="130" cy="108" r="4"/><circle cx="80" cy="126" r="4"/><circle cx="100" cy="126" r="4"/><circle cx="120" cy="126" r="4"/><circle cx="92" cy="142" r="4"/><circle cx="110" cy="142" r="4"/></g><path d="M26 90h132" fill="none" stroke-width="7"/><path d="M84 168v10M100 172v12M116 168v10" fill="none" stroke="#4FC3F7" stroke-width="5"/>`,
+  "Trichter": `<path d="M44 46h112l-42 66v56H86v-56z" fill="#FB8C00"/><ellipse cx="100" cy="46" rx="56" ry="10" fill="#FFB74D"/><path d="M92 120v40" fill="none" stroke="#FFCC80" stroke-width="5"/>`,
+  "Topflappen": `<circle cx="58" cy="44" r="12" fill="none" stroke-width="5"/><rect x="48" y="52" width="104" height="104" rx="20" fill="#E53935"/><path d="M60 80h80M60 104h80M60 128h80M76 64v80M100 64v80M124 64v80" fill="none" stroke="#FFCDD2" stroke-width="3"/><rect x="48" y="52" width="104" height="104" rx="20" fill="none"/>`,
+  "Schöpfkelle": `<path d="M120 110L162 36l9 5-40 72z" fill="#90A4AE"/><circle cx="166" cy="40" r="7" fill="#90A4AE"/><path d="M42 104h96a48 44 0 0 1-96 0z" fill="#CFD8DC"/><path d="M50 108h80q-6 20-40 22-34-2-40-22z" fill="#FFA726" stroke="none"/><path d="M38 104h104" fill="none" stroke-width="6"/>`,
+  "Reibe": `<path d="M78 46q22-30 44 0" fill="none" stroke="#455A64" stroke-width="8"/><path d="M64 46h72l16 124H48z" fill="#CFD8DC"/><g fill="#546E7A" stroke="none"><path d="M76 70h10l-3 6h-7zM96 70h10l-3 6h-7zM116 70h10l-3 6h-7zM74 92h10l-3 6h-7zM96 92h10l-3 6h-7zM118 92h10l-3 6h-7zM72 114h10l-3 6h-7zM96 114h10l-3 6h-7zM120 114h10l-3 6h-7zM70 136h10l-3 6h-7zM96 136h10l-3 6h-7zM122 136h10l-3 6h-7z"/></g><path d="M152 166q12 4 18 0" fill="none" stroke="#FFD54F" stroke-width="6"/>`,
+  "Eierbecher": `<ellipse cx="100" cy="88" rx="30" ry="40" fill="#FFF8E7"/><path d="M68 112h64q0 40-32 40t-32-40z" fill="#29B6F6"/><rect x="92" y="150" width="16" height="12" fill="#29B6F6"/><ellipse cx="100" cy="166" rx="32" ry="8" fill="#29B6F6"/><circle cx="90" cy="128" r="5" fill="#FFF" stroke="none"/><circle cx="110" cy="136" r="5" fill="#FFF" stroke="none"/>`,
+  "Thermoskanne": `<path d="M86 22q-6 8 0 14M100 18q-6 8 0 14M114 22q-6 8 0 14" fill="none" stroke="#90A4AE" stroke-width="3"/><rect x="78" y="40" width="44" height="22" rx="6" fill="#37474F"/><rect x="68" y="58" width="64" height="116" rx="16" fill="#1E88E5"/><rect x="68" y="102" width="64" height="14" fill="#90CAF9"/><rect x="68" y="58" width="64" height="116" rx="16" fill="none"/>`,
+  "Kehrblech": `<rect x="88" y="44" width="24" height="56" rx="8" fill="#26A69A"/><path d="M42 160l22-62h72l22 62z" fill="#26A69A"/><path d="M42 160h116" fill="none" stroke-width="6"/><g fill="#8D6E63" stroke="none"><circle cx="80" cy="144" r="5"/><circle cx="98" cy="150" r="4"/><circle cx="116" cy="140" r="5"/><circle cx="128" cy="152" r="3"/></g>`,
+  "Bügeleisen": `<path d="M82 92q4-34 34-34h34q10 0 10 12v22h-18V76h-24q-16 0-18 16z" fill="#1565C0"/><path d="M34 142q10-52 86-52h44l10 52z" fill="#42A5F5"/><rect x="30" y="140" width="148" height="12" rx="5" fill="#CFD8DC"/><circle cx="130" cy="114" r="8" fill="#FFF"/><path d="M60 40q-6 8 0 14M76 34q-6 8 0 14" fill="none" stroke="#90A4AE" stroke-width="3"/>`,
+  "Nähnadel": `<path d="M50 139q-26 6-20 34M50 139q34 26 66 12t46 18" fill="none" stroke="#E53935" stroke-width="4"/><g transform="rotate(-38 100 100)"><path d="M20 96h140l22 4-22 4H20q-6-4 0-8z" fill="#CFD8DC"/><ellipse cx="36" cy="100" rx="9" ry="2.5" fill="#FFF" stroke-width="2.5"/></g>`,
+  "Fingerhut": `<path d="M62 160V92q0-50 38-50t38 50v68z" fill="#CFD8DC"/><g fill="#78909C" stroke="none"><circle cx="86" cy="66" r="4"/><circle cx="100" cy="60" r="4"/><circle cx="114" cy="66" r="4"/><circle cx="80" cy="84" r="4"/><circle cx="96" cy="80" r="4"/><circle cx="112" cy="80" r="4"/><circle cx="124" cy="88" r="4"/><circle cx="78" cy="104" r="4"/><circle cx="94" cy="100" r="4"/><circle cx="110" cy="100" r="4"/><circle cx="124" cy="106" r="4"/><circle cx="86" cy="120" r="4"/><circle cx="102" cy="118" r="4"/><circle cx="118" cy="122" r="4"/></g><rect x="56" y="146" width="88" height="20" rx="8" fill="#B0BEC5"/>`,
+  "Wärmflasche": `<rect x="84" y="34" width="32" height="30" fill="#E53935"/><rect x="78" y="24" width="44" height="16" rx="5" fill="#37474F"/><rect x="48" y="58" width="104" height="118" rx="30" fill="#E53935"/><path d="M70 84h60M70 100h60M70 116h60M70 132h60M70 148h60" fill="none" stroke="#B71C1C" stroke-width="3"/>`,
+  "Glühbirne": `<path d="M100 18v10M50 40l8 8M150 40l-8 8M30 88h10M160 88h10" fill="none" stroke="#FFB300" stroke-width="5"/><path d="M80 120q-34-20-24-58 10-30 44-30t44 30q10 38-24 58l-4 20H84z" fill="#FFE066"/><path d="M90 120l2-26q8-10 16 0l2 26" fill="none" stroke="#F57F17" stroke-width="3"/><rect x="82" y="138" width="36" height="30" rx="5" fill="#B0BEC5"/><path d="M82 148h36M82 158h36" fill="none" stroke-width="3"/><path d="M92 168h16l-4 8h-8z" fill="#455A64"/>`,
+  "Steckdose": `<rect x="42" y="42" width="116" height="116" rx="22" fill="#FFF"/><circle cx="100" cy="100" r="40" fill="#ECEFF1"/><circle cx="84" cy="100" r="8" fill="#37474F"/><circle cx="116" cy="100" r="8" fill="#37474F"/><rect x="93" y="58" width="14" height="8" rx="2" fill="#B0BEC5"/><rect x="93" y="134" width="14" height="8" rx="2" fill="#B0BEC5"/>`,
+  "Batterie": `<rect x="88" y="28" width="24" height="14" rx="3" fill="#B0BEC5"/><rect x="68" y="40" width="64" height="132" rx="10" fill="#263238"/><path d="M68 50q0-10 10-10h44q10 0 10 10v40H68z" fill="#FFB300"/><path d="M92 64h16M100 56v16" fill="none" stroke="#263238" stroke-width="5"/><path d="M92 140h16" fill="none" stroke="#FFF" stroke-width="5"/>`,
+  "Taschenlampe": `<g transform="rotate(-12 100 100)"><path d="M148 74l42-20v92l-42-20z" fill="#FFF59D" stroke="none" opacity=".9"/><rect x="18" y="86" width="96" height="28" rx="8" fill="#455A64"/><path d="M112 82l36-10v56l-36-10z" fill="#607D8B"/><ellipse cx="148" cy="100" rx="6" ry="28" fill="#FFF9C4"/><rect x="58" y="80" width="18" height="8" rx="3" fill="#E53935"/></g>`,
+  "Wecker": `<path d="M68 150l-14 20M132 150l14 20" fill="none" stroke-width="7"/><circle cx="58" cy="54" r="18" fill="#E53935"/><circle cx="142" cy="54" r="18" fill="#E53935"/><path d="M92 38h16" fill="none" stroke-width="6"/><circle cx="100" cy="106" r="54" fill="#E53935"/><circle cx="100" cy="106" r="42" fill="#FFF"/><path d="M100 106V78M100 106l18 10" fill="none" stroke-width="5"/><path d="M100 70v4M136 106h-4M100 142v-4M64 106h4" fill="none" stroke-width="3"/>`,
+  "Bettdecke": `<rect x="24" y="64" width="16" height="104" rx="6" fill="#8D6E63"/><rect x="36" y="118" width="140" height="30" rx="6" fill="#FFF"/><path d="M40 148v18M170 148v18" fill="none" stroke="#8D6E63" stroke-width="7"/><ellipse cx="66" cy="108" rx="24" ry="13" fill="#FFF"/><path d="M92 102h78q10 0 10 12v32H92q-14-22 0-44z" fill="#5C6BC0"/><g fill="#C5CAE9" stroke="none"><circle cx="114" cy="116" r="4"/><circle cx="138" cy="126" r="4"/><circle cx="160" cy="114" r="4"/><circle cx="122" cy="136" r="4"/><circle cx="154" cy="138" r="4"/></g>`,
+  "Gardine": `<rect x="56" y="44" width="88" height="116" fill="#B3E5FC"/><path d="M100 44v116M56 102h88" fill="none" stroke="#FFF" stroke-width="5"/><path d="M36 38h128" fill="none" stroke="#8D6E63" stroke-width="7"/><path d="M42 40h46q-14 60 8 124H42z" fill="#FFF5F8" opacity=".95"/><path d="M158 40h-46q14 60-8 124h54z" fill="#FFF5F8" opacity=".95"/><path d="M56 48v110M70 48q-4 60 4 110M144 48v110M130 48q4 60-4 110" fill="none" stroke="#F8BBD0" stroke-width="3"/>`,
+  "Türklinke": `<rect x="40" y="20" width="120" height="170" fill="#D7B48A" stroke="none"/><rect x="58" y="48" width="30" height="116" rx="12" fill="#CFD8DC"/><path d="M72 82h78q12 0 12 10t-12 10H72z" fill="#B0BEC5"/><circle cx="73" cy="92" r="9" fill="#CFD8DC"/><circle cx="73" cy="130" r="5" fill="#37474F"/><path d="M73 132v10" fill="none" stroke="#37474F" stroke-width="5"/>`,
+  "Briefkasten": `<rect x="92" y="150" width="16" height="30" fill="#546E7A"/><path d="M46 72q0-30 54-30t54 30v84H46z" fill="#FFCC00"/><rect x="66" y="78" width="68" height="10" rx="5" fill="#37474F"/><g transform="rotate(-8 100 60)"><rect x="78" y="48" width="44" height="30" rx="3" fill="#FFF"/><path d="M78 48l22 16 22-16" fill="none" stroke-width="3"/></g><rect x="70" y="110" width="60" height="24" rx="6" fill="#FFE57F"/>`,
+  "Klingel": `<path d="M150 90q10 12 0 24M162 82q16 20 0 40" fill="none" stroke="#FFB300" stroke-width="5"/><rect x="58" y="40" width="84" height="122" rx="14" fill="#CFD8DC"/><rect x="72" y="58" width="56" height="24" rx="4" fill="#FFF"/><circle cx="100" cy="122" r="20" fill="#FFB300"/><circle cx="94" cy="116" r="5" fill="#FFE082" stroke="none"/>`,
+  "Schlüsselbund": `<circle cx="80" cy="62" r="24" fill="none" stroke="#90A4AE" stroke-width="7"/><circle cx="80" cy="62" r="24" fill="none" stroke-width="2"/>` + SCHLUESSEL(25, "#FFB300") + SCHLUESSEL(-5, "#B0BEC5") + SCHLUESSEL(-35, "#4FC3F7"),
+  "Regenschirm": `<path d="M100 104v52q0 16-12 16t-12-12" fill="none" stroke-width="6"/><path d="M28 104q0-66 72-66t72 66q-12-10-24 0-12-10-24 0-12-10-24 0-12-10-24 0-12-10-24 0-12-10-24 0z" fill="#E53935"/><path d="M100 38q-26 30-24 66M100 38q26 30 24 66" fill="none" stroke="#B71C1C" stroke-width="3"/><path d="M100 38v-10" fill="none" stroke-width="5"/><g fill="#4FC3F7" stroke="none"><path d="M40 130q-5 8 0 10 5-2 0-10zM160 132q-5 8 0 10 5-2 0-10zM146 160q-5 8 0 10 5-2 0-10zM56 160q-5 8 0 10 5-2 0-10z"/></g>`,
+  "Schnürsenkel": `<path d="M28 146q0-34 32-40l30-26q16-8 26 6 22 34 56 38 10 4 8 22z" fill="#42A5F5"/><rect x="24" y="142" width="158" height="16" rx="7" fill="#FFF"/><path d="M82 96l30 22M96 86l-22 18M108 118l14-10M88 108l24-10" fill="none" stroke="#FFF" stroke-width="5"/><g fill="none" stroke="#FFF" stroke-width="5"><ellipse cx="92" cy="70" rx="15" ry="8" transform="rotate(-25 92 70)"/><ellipse cx="122" cy="70" rx="15" ry="8" transform="rotate(25 122 70)"/><path d="M106 78l-10 18M106 78l12 16"/></g><circle cx="106" cy="78" r="4" fill="#FFF"/>`,
+  "Reißverschluss": `<path d="M70 26h30v86l-18 62H56l14-62z" fill="#1E88E5"/><path d="M130 26h-30v86l18 62h26l-14-62z" fill="#1E88E5"/><path d="M93 34h14M93 46h14M93 58h14M93 70h14M93 82h14M93 94h14" fill="none" stroke="#ECEFF1" stroke-width="6"/><path d="M88 120l-8 26M112 120l8 26" fill="none" stroke="#ECEFF1" stroke-width="5" stroke-dasharray="3 6"/><rect x="86" y="96" width="28" height="30" rx="7" fill="#CFD8DC"/><rect x="94" y="124" width="12" height="32" rx="5" fill="#B0BEC5"/>`,
+  "Hosenträger": `<path d="M58 98h84l8 76h-40l-10-54-10 54H50z" fill="#5D4037"/><path d="M58 98h84" fill="none" stroke="#3E2723" stroke-width="6"/><path d="M74 98L84 26M126 98L116 26" fill="none" stroke-width="13"/><path d="M74 98L84 26M126 98L116 26" fill="none" stroke="#E53935" stroke-width="8"/><rect x="66" y="90" width="16" height="14" rx="3" fill="#CFD8DC"/><rect x="118" y="90" width="16" height="14" rx="3" fill="#CFD8DC"/>`,
+  "Lesebrille": `<path d="M42 92l-16-16M158 92l16-16" fill="none" stroke-width="6"/><circle cx="68" cy="104" r="30" fill="#E1F5FE"/><circle cx="132" cy="104" r="30" fill="#E1F5FE"/><path d="M98 100q2-10 4 0" fill="none" stroke-width="5"/><path d="M56 92q6-6 14-6M120 92q6-6 14-6" fill="none" stroke="#FFF" stroke-width="4"/><circle cx="68" cy="104" r="30" fill="none" stroke-width="6"/><circle cx="132" cy="104" r="30" fill="none" stroke-width="6"/>`,
+  "Zahnbürste": `<g transform="rotate(-30 100 100)"><rect x="18" y="94" width="122" height="14" rx="7" fill="#26C6DA"/><rect x="124" y="90" width="50" height="20" rx="7" fill="#26C6DA"/><rect x="128" y="68" width="42" height="22" fill="#FFF"/><path d="M136 70v18M146 70v18M156 70v18M164 70v18" fill="none" stroke="#B2EBF2" stroke-width="3"/><path d="M130 66q4-12 12-4 6-10 12-2 6-8 14 0" fill="#E1F5FE" stroke-width="3"/></g>`,
+  "Kamm": `<path d="M42 92v48M54 92v48M66 92v48M78 92v48M90 92v48M102 92v48M114 92v48M126 92v48M138 92v48M150 92v48M162 92v48" fill="none" stroke-width="10"/><path d="M42 92v48M54 92v48M66 92v48M78 92v48M90 92v48M102 92v48M114 92v48M126 92v48M138 92v48M150 92v48M162 92v48" fill="none" stroke="#FF8A65" stroke-width="5"/><rect x="32" y="64" width="140" height="30" rx="10" fill="#FF8A65"/>`,
+  "Pinzette": `<path d="M98 30L66 162q2 8 8 4l28-122z" fill="#CFD8DC"/><path d="M102 30l32 132q-2 8-8 4L98 44z" fill="#CFD8DC"/><rect x="90" y="22" width="20" height="18" rx="6" fill="#90A4AE"/><path d="M80 110h40" fill="none" stroke="#90A4AE" stroke-width="3"/>`,
+  "Tablette": `<rect x="34" y="56" width="132" height="92" rx="12" fill="#ECEFF1"/><g fill="#FFF"><circle cx="66" cy="84" r="16"/><circle cx="100" cy="84" r="16"/><circle cx="134" cy="84" r="16"/><circle cx="66" cy="122" r="16"/><circle cx="100" cy="122" r="16"/></g><circle cx="134" cy="122" r="16" fill="#CFD8DC" stroke-dasharray="4 4"/><circle cx="150" cy="160" r="20" fill="#F48FB1"/><path d="M136 160h28" fill="none" stroke="#C2185B" stroke-width="3"/>`,
+  "Verband": `<rect x="66" y="100" width="112" height="40" fill="#FFF"/><path d="M90 100v40M114 100v40M138 100v40M162 100v40M66 120h112" fill="none" stroke="#E0E0E0" stroke-width="3"/><circle cx="66" cy="102" r="38" fill="#FFF"/><circle cx="66" cy="102" r="24" fill="none" stroke="#E0E0E0" stroke-width="3"/><circle cx="66" cy="102" r="11" fill="#ECEFF1"/>`,
+  "Krücke": `<rect x="94" y="42" width="12" height="128" rx="6" fill="#90A4AE"/><path d="M82 30q18-14 36 0v20q-18-10-36 0z" fill="#455A64"/><rect x="104" y="96" width="42" height="14" rx="7" fill="#37474F"/><rect x="90" y="166" width="20" height="14" rx="5" fill="#37474F"/>`,
+  "Zange": `<path d="M96 100l-8-62q4-10 12-8l6 70z" fill="#90A4AE"/><path d="M104 100l8-62q-4-10-12-8l-6 70z" fill="#90A4AE"/><path d="M96 100q-28 30-26 76h18q-4-40 16-68z" fill="#E53935"/><path d="M104 100q28 30 26 76h-18q4-40-16-68z" fill="#E53935"/><circle cx="100" cy="100" r="8" fill="#CFD8DC"/>`,
+  "Zollstock": `<path d="M32 152l40-90 40 90 40-90" fill="none" stroke-width="24"/><path d="M32 152l40-90 40 90 40-90" fill="none" stroke="#FDD835" stroke-width="16"/><path d="M32 152l40-90 40 90 40-90" fill="none" stroke-width="3" stroke-linecap="butt" stroke-dasharray="2 8"/>`,
+  "Wasserwaage": `<rect x="22" y="84" width="156" height="36" rx="6" fill="#FDD835"/><rect x="80" y="91" width="40" height="22" rx="11" fill="#C5E1A5"/><ellipse cx="100" cy="102" rx="8" ry="5" fill="#FFF" stroke-width="2"/><path d="M90 91v22M110 91v22" fill="none" stroke-width="3"/><circle cx="44" cy="102" r="6" fill="#FFF59D"/><circle cx="156" cy="102" r="6" fill="#FFF59D"/>`,
+  "Säge": `<path d="M56 78l124 16v31H56z" fill="#CFD8DC"/><path d="M56 125${SAEGEZAHN}" fill="#CFD8DC"/><path d="M18 66h42v82H18q-8-40 0-82z" fill="#8D6E63"/><ellipse cx="38" cy="104" rx="9" ry="20" fill="#FFF0D2"/>`,
+  "Schubkarre": `<path d="M68 122L28 136" fill="none" stroke="#8D6E63" stroke-width="7"/><path d="M138 124l8 22M74 124l-6 36" fill="none" stroke="#546E7A" stroke-width="6"/><path d="M40 70h128l-28 58H70z" fill="#43A047"/><path d="M40 70h128" fill="none" stroke="#2E7D32" stroke-width="6"/><circle cx="146" cy="150" r="20" fill="#37474F"/><circle cx="146" cy="150" r="7" fill="#B0BEC5"/>`,
+  "Rasenmäher": `<path d="M138 98L172 34l-14-6" fill="none" stroke-width="7"/><path d="M48 124q4-34 50-34h40q12 0 12 34z" fill="#E53935"/><rect x="40" y="120" width="118" height="18" rx="7" fill="#C62828"/><circle cx="64" cy="150" r="15" fill="#37474F"/><circle cx="138" cy="150" r="15" fill="#37474F"/><circle cx="64" cy="150" r="5" fill="#B0BEC5"/><circle cx="138" cy="150" r="5" fill="#B0BEC5"/><path d="M28 176l6-14 6 14M160 176l6-14 6 14" fill="none" stroke="#43A047" stroke-width="4"/>`,
+  "Harke": `<rect x="95" y="18" width="10" height="124" rx="4" fill="#A1887F"/><rect x="54" y="138" width="92" height="12" rx="5" fill="#90A4AE"/><path d="M60 150v18M73 150v18M86 150v18M100 150v18M114 150v18M127 150v18M140 150v18" fill="none" stroke-width="5"/><g stroke-width="3"><ellipse cx="40" cy="160" rx="12" ry="6" transform="rotate(-20 40 160)" fill="#FB8C00"/><ellipse cx="160" cy="166" rx="12" ry="6" transform="rotate(25 160 166)" fill="#FDD835"/><ellipse cx="48" cy="120" rx="10" ry="5" transform="rotate(30 48 120)" fill="#E53935"/></g>`,
+  "Gartenschlauch": `<g fill="none"><path d="M140 100a50 50 0 1 1-50-50 38 38 0 1 1-38 38 26 26 0 1 1 26 26" stroke-width="16"/><path d="M140 100a50 50 0 1 1-50-50 38 38 0 1 1-38 38 26 26 0 1 1 26 26" stroke="#43A047" stroke-width="9"/><path d="M140 100l18 30" stroke-width="16"/><path d="M140 100l18 30" stroke="#43A047" stroke-width="9"/></g><rect x="150" y="126" width="16" height="30" rx="5" transform="rotate(-30 158 141)" fill="#FFB300"/><g fill="#4FC3F7" stroke="none"><circle cx="172" cy="166" r="4"/><circle cx="160" cy="172" r="4"/><circle cx="178" cy="154" r="3"/></g>`,
+  "Blumentopf": `<path d="M100 108V58" fill="none" stroke="#2E7D32" stroke-width="5"/><ellipse cx="80" cy="86" rx="18" ry="8" transform="rotate(30 80 86)" fill="#66BB6A"/><ellipse cx="120" cy="80" rx="18" ry="8" transform="rotate(-30 120 80)" fill="#66BB6A"/><g fill="#FF7043"><circle cx="100" cy="36" r="10"/><circle cx="84" cy="46" r="10"/><circle cx="116" cy="46" r="10"/><circle cx="90" cy="62" r="10"/><circle cx="110" cy="62" r="10"/></g><circle cx="100" cy="50" r="8" fill="#FFD54F"/><path d="M60 118h80l-10 54H70z" fill="#D84315"/><rect x="54" y="104" width="92" height="18" rx="5" fill="#F4511E"/>`,
+  "Kugelschreiber": `<g transform="rotate(-38 100 100)"><rect x="24" y="93" width="16" height="14" rx="4" fill="#37474F"/><rect x="38" y="90" width="114" height="20" rx="10" fill="#1E88E5"/><rect x="54" y="82" width="46" height="7" rx="3" fill="#B0BEC5"/><path d="M150 92l26 8-26 8z" fill="#CFD8DC"/><path d="M176 100h4" fill="none" stroke="#1E88E5" stroke-width="5"/></g>`,
+  "Büroklammer": `<rect x="44" y="50" width="96" height="120" rx="4" transform="rotate(-8 92 110)" fill="#FFF"/><path d="M60 84h56M60 100h60M60 116h50" transform="rotate(-8 92 110)" fill="none" stroke="#CFD8DC" stroke-width="4"/><g fill="none"><path d="M118 66v70a10 10 0 0 1-20 0V48a20 20 0 0 1 40 0v100a16 16 0 0 1-32 0V80" stroke-width="12"/><path d="M118 66v70a10 10 0 0 1-20 0V48a20 20 0 0 1 40 0v100a16 16 0 0 1-32 0V80" stroke="#90A4AE" stroke-width="6"/></g>`,
+  "Locher": `<rect x="28" y="148" width="146" height="14" rx="5" fill="#37474F"/><path d="M40 150v-34q0-12 14-12h96q14 0 14 12v34z" fill="#1E88E5"/><path d="M44 100q56-34 124-6v14q-66-24-124 6z" fill="#90CAF9"/><g fill="#FFF"><circle cx="40" cy="178" r="5"/><circle cx="58" cy="182" r="5"/><circle cx="150" cy="178" r="5"/></g>`,
+  "Briefumschlag": `<rect x="32" y="56" width="136" height="92" rx="6" fill="#FFF"/><path d="M32 60l68 52 68-52" fill="#F5F5F5"/><path d="M32 146l50-40M168 146l-50-40" fill="none" stroke-width="3"/><rect x="136" y="64" width="22" height="26" fill="#E53935" stroke-width="3"/><circle cx="147" cy="77" r="5" fill="#FFCDD2" stroke="none"/>`,
+  "Kalender": `<rect x="42" y="48" width="116" height="116" rx="12" fill="#FFF"/><path d="M42 82V60q0-12 12-12h92q12 0 12 12v22z" fill="#E53935"/><rect x="66" y="36" width="10" height="24" rx="5" fill="#455A64"/><rect x="124" y="36" width="10" height="24" rx="5" fill="#455A64"/><g fill="#CFD8DC" stroke="none"><rect x="56" y="94" width="16" height="14" rx="3"/><rect x="80" y="94" width="16" height="14" rx="3"/><rect x="104" y="94" width="16" height="14" rx="3"/><rect x="128" y="94" width="16" height="14" rx="3"/><rect x="56" y="116" width="16" height="14" rx="3"/><rect x="80" y="116" width="16" height="14" rx="3"/><rect x="128" y="116" width="16" height="14" rx="3"/><rect x="56" y="138" width="16" height="14" rx="3"/><rect x="80" y="138" width="16" height="14" rx="3"/><rect x="104" y="138" width="16" height="14" rx="3"/></g><circle cx="112" cy="123" r="11" fill="none" stroke="#E53935"/>`,
+  "Fernglas": `<rect x="56" y="54" width="28" height="28" rx="5" fill="#263238"/><rect x="116" y="54" width="28" height="28" rx="5" fill="#263238"/><rect x="44" y="76" width="50" height="84" rx="14" fill="#455A64"/><rect x="106" y="76" width="50" height="84" rx="14" fill="#455A64"/><rect x="88" y="96" width="24" height="26" rx="4" fill="#37474F"/><ellipse cx="69" cy="158" rx="20" ry="7" fill="#81D4FA"/><ellipse cx="131" cy="158" rx="20" ry="7" fill="#81D4FA"/>`,
+  "Liegestuhl": `<circle cx="52" cy="52" r="16" fill="#FFD54F"/><path d="M58 172L128 38M156 172l-52-70M84 122h68" fill="none" stroke="#8D6E63" stroke-width="8"/><path d="M116 42l18 8q-34 70 26 86l-6 16q-80-20-38-110z" fill="#29B6F6"/><path d="M123 46q-36 74 34 96" fill="none" stroke="#FFF" stroke-width="5"/><path d="M116 42l18 8q-34 70 26 86l-6 16q-80-20-38-110z" fill="none"/><path d="M20 176h160" fill="none" stroke="#FFE082" stroke-width="6"/>`,
+  "Hängematte": `<rect x="24" y="56" width="14" height="124" rx="4" fill="#8D6E63"/><rect x="162" y="56" width="14" height="124" rx="4" fill="#8D6E63"/><circle cx="31" cy="48" r="22" fill="#66BB6A"/><circle cx="169" cy="48" r="22" fill="#66BB6A"/><path d="M38 84l18 20M162 84l-18 20" fill="none" stroke-width="3"/><path d="M52 100q48 64 96 0q-48 36-96 0z" fill="#FFB74D"/><path d="M60 108q40 40 80 0M72 104l6 26M100 106v32M128 104l-6 26" fill="none" stroke="#E65100" stroke-width="3"/>`,
+  "Portemonnaie": `<rect x="58" y="44" width="76" height="40" rx="4" fill="#A5D6A7"/><circle cx="96" cy="60" r="8" fill="#C8E6C9" stroke-width="3"/><rect x="36" y="70" width="128" height="86" rx="14" fill="#8D6E63"/><path d="M118 96h46v34h-46q-12 0-12-17t12-17z" fill="#6D4C41"/><circle cx="124" cy="113" r="6" fill="#FFD54F"/><circle cx="58" cy="164" r="14" fill="#FFD54F"/><circle cx="58" cy="164" r="7" fill="none" stroke="#FFB300" stroke-width="3"/>`,
+  "Fahrkarte": `<path d="M30 60h140v28a12 12 0 0 0 0 24v28H30v-28a12 12 0 0 0 0-24z" fill="#FFE082"/><path d="M132 66v68" fill="none" stroke-width="3" stroke-dasharray="5 6"/><rect x="54" y="72" width="44" height="46" rx="10" fill="#1E88E5"/><rect x="61" y="79" width="30" height="16" rx="3" fill="#E3F2FD"/><circle cx="66" cy="106" r="4" fill="#FFF59D"/><circle cx="86" cy="106" r="4" fill="#FFF59D"/><path d="M60 126l-6 8M92 126l6 8" fill="none" stroke-width="4"/><path d="M144 80h12M144 100h12M144 120h12" fill="none" stroke="#FFB300" stroke-width="4"/>`,
+};
+function zeichnungFuer(wort) {
+  const d = imWoerterbuch(wort);
+  if (!d || !ZEICHNUNGEN[d.w]) return "";
+  return zeichnungSvg(ZEICHNUNGEN[d.w], ZBG[d.k]);
+}
+
+/* ======================================================================
    Hilfsfunktionen
    ====================================================================== */
 const $ = (id) => document.getElementById(id);
@@ -453,10 +627,11 @@ function erklaerungEnthaeltWort(erkl, wort) {
 const SPEICHER_V2 = "wortschatz.v2";
 let speicherOk = true;
 function neueId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function leereDaten() { return { karten:[], tage:{}, einstellungen:{ laenge:"k10" } }; }
+const EINST_STANDARD = { laenge:"k10", bilder:true, bildAlsTipp:false, bildart:"zeichnung" };
+function leereDaten() { return { karten:[], tage:{}, einstellungen: Object.assign({}, EINST_STANDARD) }; }
 function datenPruefen(d) {
   d = d || {};
-  const e = Object.assign({ laenge:"k10" }, d.einstellungen || {}); delete e.apiKey;
+  const e = Object.assign({}, EINST_STANDARD, d.einstellungen || {}); delete e.apiKey;
   return { karten: Array.isArray(d.karten) ? d.karten : [], tage: (d.tage && typeof d.tage === "object") ? d.tage : {}, einstellungen: e };
 }
 function kontoPruefen(k) {
@@ -468,8 +643,8 @@ function lesen(schluessel) {
   catch (e) { speicherOk = false; return null; }
 }
 function sichern() {
-  try { localStorage.setItem(SPEICHER_V2, JSON.stringify(G)); speicherOk = true; }
-  catch (e) { speicherOk = false; }
+  try { localStorage.setItem(SPEICHER_V2, JSON.stringify(G)); speicherOk = true; return true; }
+  catch (e) { speicherOk = false; return false; }
 }
 
 let G = { version:2, apiKey:"", aktiv:null, konten:[] };
@@ -561,7 +736,7 @@ function bestaetigen(ort, frage, optionen, neutral) {
 let startHinweis = null;
 let kontenMeldung = null;
 function zeige(name) {
-  if (["start","neu","ueben","fertig","liste","einst"].includes(name) && !K) return appStart();
+  if (["start","neu","ueben","fertig","liste","einst","aehnlich"].includes(name) && !K) return appStart();
   bestaetigungSchliessen();
   document.querySelectorAll(".ansicht").forEach(v => v.classList.remove("aktiv"));
   $("v-"+name).classList.add("aktiv");
@@ -665,15 +840,275 @@ $("k-einst").addEventListener("click", () => zeige("einst"));
 $("k-start-wechseln").addEventListener("click", () => zeige("konten"));
 
 /* ======================================================================
+   Bilder: eigenes Foto (IndexedDB), Zeichnung (Startwörter oder KI), Wikipedia.
+   Reihenfolge: eigenes Foto, sonst Zeichnung, sonst Wikipedia. Mit der Einstellung
+   "Bildart: Foto (Wikipedia)" kommt Wikipedia vor der Zeichnung.
+   k.bild = ausdrückliche Wahl: {art:"foto"} | {art:"zeichnung", svg} | {art:"wiki", url, seite} | {art:"keins"}
+            fehlt = automatisch.
+   k.wiki = gemerkter Wikipedia-Treffer {url, seite} oder "" (nichts Passendes), fehlt = noch nicht gesucht.
+   Eigene Fotos liegen in IndexedDB unter "kontoId|wort" (localStorage hat nur ca. 5 MB).
+   ====================================================================== */
+let dbVersprechen = null;
+function bildDb() {
+  if (!dbVersprechen) {
+    dbVersprechen = new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open("wortschatz-bilder", 1);
+        r.onupgradeneeded = () => r.result.createObjectStore("bilder");
+        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+      } catch (e) { rej(e); }
+    });
+    dbVersprechen.catch(() => { dbVersprechen = null; });
+  }
+  return dbVersprechen;
+}
+async function idb(modus, fn) {
+  const db = await bildDb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("bilder", modus); const r = fn(tx.objectStore("bilder")); let erg;
+    if (r) r.onsuccess = () => { erg = r.result; };
+    tx.oncomplete = () => res(erg); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+  });
+}
+function bildSchluessel(kontoId, wort) { return kontoId + "|" + normal(wort); }
+const fotoSpeichern = (key, daten) => idb("readwrite", st => st.put(daten, key));
+const fotoHolen = (key) => idb("readonly", st => st.get(key)).catch(() => null);
+const fotoLoeschen = (key) => idb("readwrite", st => st.delete(key)).catch(() => {});
+const fotosKontoLoeschen = (id) => idb("readwrite", st => st.delete(IDBKeyRange.bound(id + "|", id + "|￿"))).catch(() => {});
+function speicherZeichen() { try { return JSON.stringify(G).length; } catch (e) { return 0; } }
+function svgUrl(svg) { return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); }
+
+/* Foto im Browser verkleinern (längste Seite höchstens max Pixel), Ergebnis als JPEG-dataURL */
+function fotoVerkleinern(datei, max, qualitaet) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(datei); const img = new Image();
+    img.onload = () => {
+      const f = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(img.naturalWidth * f)); c.height = Math.max(1, Math.round(img.naturalHeight * f));
+      const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", qualitaet || 0.8));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("Das Foto konnte nicht gelesen werden.")); };
+    img.src = url;
+  });
+}
+
+/* Wikipedia: Kurzfassung der Seite (nur echte Artikel, keine Begriffsklärung).
+   Bei Begriffsklärung wird noch "Wort (Gruppe)" versucht, z. B. "Spritze (Medizin)". */
+const WIKI = "https://de.wikipedia.org/api/rest_v1/page/";
+function wikiTitel(t) { return encodeURIComponent(String(t).trim().replace(/ /g, "_")); }
+async function wikiSuchen(wort, kategorie) {
+  const titel = [wort]; if (kategorie) titel.push(wort + " (" + kategorie + ")");
+  let erreicht = false;
+  for (const t of titel) {
+    let j;
+    try { const r = await fetch(WIKI + "summary/" + wikiTitel(t)); erreicht = true; if (!r.ok) continue; j = await r.json(); }
+    catch (e) { continue; }
+    if (!j || j.type === "disambiguation") continue;
+    const src = (j.thumbnail && j.thumbnail.source) || (j.originalimage && j.originalimage.source);
+    if (src) return { url: src, seite: j.title || t };
+  }
+  if (!erreicht) throw new Error("Keine Verbindung");
+  return null;
+}
+function wikiDatei(u) { try { return decodeURIComponent(String(u).split("/").pop()).replace(/^\d+px-/, ""); } catch (e) { return String(u); } }
+async function wikiAnderes(seite, aktuell) {
+  const r = await fetch(WIKI + "media-list/" + wikiTitel(seite)); if (!r.ok) return null;
+  const j = await r.json();
+  const urls = (j.items || []).filter(i => i.type === "image" && i.srcset && i.srcset.length)
+    .map(i => { const s = i.srcset[0].src; return s.startsWith("//") ? "https:" + s : s; })
+    .filter(u => !/\.svg/i.test(u));
+  if (!urls.length) return null;
+  const i = urls.findIndex(u => wikiDatei(u) === wikiDatei(aktuell || ""));
+  const naechste = urls[(i + 1) % urls.length];
+  return naechste && wikiDatei(naechste) !== wikiDatei(aktuell || "") ? { url: naechste, seite } : null;
+}
+const wikiLaeuft = {};
+function wikiFuer(k) {
+  if (k.wiki !== undefined) return Promise.resolve(k.wiki || null);
+  const key = normal(k.wort) + "|" + (k.kategorie || "");
+  if (!wikiLaeuft[key]) wikiLaeuft[key] = wikiSuchen(k.wort, k.kategorie).finally(() => { delete wikiLaeuft[key]; });
+  return wikiLaeuft[key].then(t => { k.wiki = t || ""; sichern(); return t; }, () => null); // offline: später nochmal versuchen
+}
+
+/* Liefert das Bild einer Karte: { src, quelle, art, ki, seite } oder null */
+async function bildFuer(k, einst) {
+  einst = einst || (S && S.einstellungen) || {};
+  const b = k.bild || {};
+  if (b.art === "keins") return null;
+  if (b.art === "foto") {
+    const daten = b.daten || (K ? await fotoHolen(bildSchluessel(K.id, k.wort)) : null);
+    if (daten) return { src: daten, quelle: "eigenes Foto", art: "foto" };
+  }
+  if (b.art === "wiki" && b.url) return { src: b.url, quelle: "Wikipedia", art: "wiki", seite: b.seite };
+  const svg = b.art === "zeichnung" ? b.svg : zeichnungFuer(k.wort);
+  const zeichnung = svg ? { src: svgUrl(svg), quelle: "Zeichnung", art: "zeichnung", ki: b.art === "zeichnung" } : null;
+  if (einst.bildart !== "foto" && zeichnung) return zeichnung;
+  const w = await wikiFuer(k);
+  if (w) return { src: w.url, quelle: "Wikipedia", art: "wiki", seite: w.seite };
+  return zeichnung;
+}
+/* Bild anzeigen. Die Bildunterschrift nennt nie das Wort, nur die Quelle. */
+function bildSetzen(fig, img, cap, b) {
+  if (!b) { fig.classList.add("unsichtbar"); img.removeAttribute("src"); return; }
+  img.onerror = () => fig.classList.add("unsichtbar");
+  img.src = b.src; cap.textContent = "Bild: " + b.quelle; fig.classList.remove("unsichtbar");
+}
+
+/* KI-Zeichnung streng säubern: nur erlaubte Elemente und Attribute, keine Skripte, keine Verweise nach außen.
+   Angezeigt wird sie nur als <img src="data:..."> (nicht im Seiteninhalt), dann läuft darin ohnehin nichts. */
+const SVG_ELEMENTE = new Set(["svg","g","path","circle","ellipse","rect","line","polyline","polygon","defs","linearGradient","radialGradient","stop"]);
+const SVG_ATTRIBUTE = new Set(["viewBox","d","cx","cy","r","rx","ry","x","y","x1","y1","x2","y2","points","fill","stroke","stroke-width",
+  "stroke-linecap","stroke-linejoin","stroke-dasharray","stroke-opacity","fill-opacity","fill-rule","opacity","transform","id","offset",
+  "stop-color","stop-opacity","gradientUnits","gradientTransform","fx","fy"]);
+function svgSaeubern(text) {
+  const m = String(text || "").match(/<svg[\s\S]*<\/svg>/i); if (!m) return "";
+  let doc; try { doc = new DOMParser().parseFromString(m[0], "image/svg+xml"); } catch (e) { return ""; }
+  const wurzel = doc.documentElement;
+  if (!wurzel || wurzel.localName !== "svg" || doc.getElementsByTagName("parsererror").length) return "";
+  const NS = "http://www.w3.org/2000/svg";
+  function kopie(el) {
+    if (!SVG_ELEMENTE.has(el.localName) || el.namespaceURI !== NS) return null;
+    const neu = document.createElementNS(NS, el.localName);
+    for (const a of Array.from(el.attributes)) {
+      const n = a.name, v = a.value;
+      if (!SVG_ATTRIBUTE.has(n) || /^on/i.test(n)) continue;
+      if (/url\s*\(/i.test(v) && !/^\s*url\(\s*#[\w-]+\s*\)\s*$/.test(v)) continue; // nur Verweise innerhalb der Zeichnung
+      if (/javascript:|data:|expression|[<>]/i.test(v)) continue;
+      neu.setAttribute(n, v);
+    }
+    for (const kind of Array.from(el.children)) { const c = kopie(kind); if (c) neu.appendChild(c); }
+    return neu;
+  }
+  const sauber = kopie(wurzel); if (!sauber || !sauber.children.length) return "";
+  if (!sauber.getAttribute("viewBox")) sauber.setAttribute("viewBox", "0 0 200 200");
+  const s = new XMLSerializer().serializeToString(sauber);
+  return s.length <= 30000 ? s : "";
+}
+
+/* ======================================================================
+   KI (Claude API, nur Test: Schlüssel lokal, gilt für alle Konten)
+   ====================================================================== */
+async function kiAnfrage(inhalt, schema, maxTokens) {
+  const key = G.apiKey; if (!key) throw new Error("Kein KI-Schlüssel");
+  const basis = { model:"claude-sonnet-5-5", max_tokens: maxTokens || 2000, output_config:{ effort:"low" }, messages:[{ role:"user", content: inhalt }] };
+  if (schema) basis.output_config.format = { type:"json_schema", schema };
+  const kopf = { "content-type":"application/json", "x-api-key": key, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" };
+  // Erst mit automatischer Ausweich-Option (Fallback), bei Ablehnung des Parameters ohne.
+  let r = await fetch("https://api.anthropic.com/v1/messages", { method:"POST",
+    headers: Object.assign({ "anthropic-beta":"server-side-fallback-2026-07-01" }, kopf), body: JSON.stringify(Object.assign({ fallbacks:"default" }, basis)) });
+  if (r.status === 400) r = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers: kopf, body: JSON.stringify(basis) });
+  let j = null; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error((j && j.error && j.error.message) || ("Fehler " + r.status));
+  if (j.stop_reason === "refusal") throw new Error("Die KI hat dazu nichts geschrieben.");
+  return (j.content || []).filter(b => b.type === "text").map(b => b.text).join("");
+}
+/* JSON robust aus dem Antworttext holen (auch mit ```json ... ``` oder Text drumherum) */
+function jsonAusText(text) {
+  const t = String(text || "").replace(/```(?:json)?/gi, "").trim();
+  try { return JSON.parse(t); } catch (e) {}
+  const a = t.search(/[\[{]/); if (a < 0) throw new Error("Antwort nicht lesbar.");
+  const b = t.lastIndexOf(t[a] === "{" ? "}" : "]"); if (b <= a) throw new Error("Antwort nicht lesbar.");
+  return JSON.parse(t.slice(a, b + 1));
+}
+function ohneStrich(s) { return String(s || "").replace(/\s*[\u2014\u2013]\s*/g, ", ").trim(); }
+function eintragLesen(x) {
+  if (typeof x === "string") x = { wort: x };
+  if (!x || !x.wort) return null;
+  const wort = String(x.wort).trim().replace(/^(der|die|das)\s+/i, "");
+  const d = imWoerterbuch(wort) || {};
+  return { wort, artikel: String(x.artikel || d.a || "").trim(), erklaerung: ohneStrich(x.erklaerung || x["erklärung"] || d.e || ""),
+    kategorie: String(x.kategorie || d.k || "").trim(), reim: String(x.reim || x.reimwort || d.r || "").trim() };
+}
+const KARTE_FELDER = { erklaerung:{type:"string"}, kategorie:{type:"string"}, artikel:{type:"string"}, reim:{type:"string"} };
+const KARTE_REGELN = "erklaerung = 1 bis 2 kurze, einfache Sätze auf Deutsch, die beschreiben, was es ist oder wofür man es braucht, alltagsnah. " +
+  "Das Wort selbst und Teile davon dürfen NICHT vorkommen. Keine Gedankenstriche. Freundlich, nicht kindlich. " +
+  "Schreib unpersönlich mit „man“. Falls du die lernende Person doch ansprichst, dann mit „du“, nie mit „Sie“.\n" +
+  "kategorie = ein einzelnes Wort als Gruppe (z. B. Küche, Werkzeug, Medizin, Garten).\n" +
+  "artikel = der, die oder das (leer, wenn kein Nomen).\n" +
+  "reim = ein einfaches deutsches Wort, das sich auf das Wort oder auf seinen letzten Wortteil reimt.";
+
+async function kiErklaerung(wort) {
+  const prompt = "Ein älterer Mensch übt mit Karteikarten Wörter, die ihm im Gespräch nicht mehr einfallen (Wortfindung üben). " +
+    "Schreibe für das Wort \"" + wort + "\" die Vorderseite der Karte.\nRegeln: " + KARTE_REGELN;
+  const schema = { type:"object", additionalProperties:false, required:["erklaerung","kategorie","artikel","reim"], properties: KARTE_FELDER };
+  const d = jsonAusText(await kiAnfrage(prompt, schema, 2000));
+  return eintragLesen(Object.assign({}, d, { wort }));
+}
+async function kiZeichnen(wort) {
+  const prompt = "Zeichne eine einfache, freundliche Cartoon-Zeichnung von „" + wort + "“ als SVG für eine Lernkarte (ein älterer Mensch übt damit Wörter).\n" +
+    "Stil: viewBox=\"0 0 200 200\". Zuerst ein heller Hintergrundkreis (circle cx=\"100\" cy=\"100\" r=\"94\", helle Pastellfarbe, ohne Umriss). " +
+    "Darauf der Gegenstand groß und mittig, klar erkennbar, mit kräftiger dunkler Umrisslinie (stroke=\"#2B2B2B\", stroke-width=\"4\", " +
+    "stroke-linejoin=\"round\", stroke-linecap=\"round\"), flachen, freundlichen Farben und leicht gerundeten Formen.\n" +
+    "Verboten: Text, Buchstaben, Zahlen, Bilder, Skripte, style, Verweise nach außen. Erlaubt sind nur svg, g, path, circle, ellipse, rect, line, polyline, polygon. " +
+    "Höchstens 3000 Zeichen. Gib nur das <svg>-Element zurück, ohne Erklärung.";
+  const svg = svgSaeubern(await kiAnfrage(prompt, null, 4000));
+  if (!svg) throw new Error("Keine brauchbare Zeichnung.");
+  return svg;
+}
+async function kiErkennen(dataUrl) {
+  const prompt = "Ein älterer Mensch übt mit Karteikarten Wörter, die ihm im Gespräch nicht mehr einfallen. Er hat ein Ding fotografiert. " +
+    "Erkenne den Hauptgegenstand auf dem Foto und nenne das gebräuchliche deutsche Hauptwort aus dem Alltag (z. B. „Gießkanne“, nicht „Bewässerungsgefäß“).\n" +
+    "wort = Hauptwort im Singular, ohne Artikel.\n" + KARTE_REGELN + "\n" +
+    "sicherheit = hoch, mittel oder niedrig, je nachdem wie sicher du den Gegenstand erkennst.\n" +
+    "alternativen = bis zu 2 andere Wörter, die es auch sein könnten, mit denselben Feldern (leer, wenn du sicher bist).";
+  const eintrag = { type:"object", additionalProperties:false, required:["wort","erklaerung","kategorie","artikel","reim"], properties: Object.assign({ wort:{type:"string"} }, KARTE_FELDER) };
+  const schema = { type:"object", additionalProperties:false, required:["wort","erklaerung","kategorie","artikel","reim","sicherheit","alternativen"],
+    properties: Object.assign({ wort:{type:"string"}, sicherheit:{ type:"string", enum:["hoch","mittel","niedrig"] }, alternativen:{ type:"array", items: eintrag } }, KARTE_FELDER) };
+  const inhalt = [{ type:"image", source:{ type:"base64", media_type:"image/jpeg", data: dataUrl.split(",")[1] } }, { type:"text", text: prompt }];
+  const d = jsonAusText(await kiAnfrage(inhalt, schema, 3000));
+  const haupt = eintragLesen(d); if (!haupt) throw new Error("Kein Gegenstand erkannt.");
+  haupt.sicherheit = ["hoch","mittel","niedrig"].includes(d.sicherheit) ? d.sicherheit : "mittel";
+  haupt.alternativen = (Array.isArray(d.alternativen) ? d.alternativen : []).map(eintragLesen).filter(a => a && normal(a.wort) !== normal(haupt.wort)).slice(0, 2);
+  return haupt;
+}
+async function kiVorschlaege(schwer) {
+  const vorhanden = S.karten.map(k => k.wort);
+  const prompt = "Ein älterer Mensch übt mit Karteikarten Wörter, die ihm im Gespräch nicht mehr einfallen. Diese Wörter waren gerade schwer:\n" +
+    schwer.map(k => "- " + k.wort + (k.kategorie ? " (Gruppe: " + k.kategorie + ")" : "")).join("\n") +
+    "\n\nSchlage zu jedem schweren Wort 3 bis 5 verwandte Wörter aus demselben Bereich vor (gleiches Sachgebiet oder Bedeutungsfeld), " +
+    "eher seltener benutzte Alltagswörter, die man aber kennt. Keine Wörter aus dieser Liste, die hat er schon: " + vorhanden.join(", ") + ". Keine doppelten Vorschläge.\n" +
+    "Für jedes Wort: zu = das schwere Wort, zu dem es passt. wort = Hauptwort ohne Artikel.\n" + KARTE_REGELN + "\n" +
+    "Antworte nur mit JSON in der Form {\"vorschlaege\":[{\"zu\":\"...\",\"wort\":\"...\",\"artikel\":\"...\",\"erklaerung\":\"...\",\"kategorie\":\"...\",\"reim\":\"...\"}]}.";
+  const item = { type:"object", additionalProperties:false, required:["zu","wort","erklaerung","kategorie","artikel","reim"],
+    properties: Object.assign({ zu:{type:"string"}, wort:{type:"string"} }, KARTE_FELDER) };
+  const schema = { type:"object", additionalProperties:false, required:["vorschlaege"], properties:{ vorschlaege:{ type:"array", items: item } } };
+  const d = jsonAusText(await kiAnfrage(prompt, schema, 6000));
+  let liste = Array.isArray(d) ? d : (d.vorschlaege || d["vorschläge"] || d.woerter || []);
+  liste = liste.flatMap(x => x && Array.isArray(x.woerter) ? x.woerter.map(w => Object.assign({ zu: x.zu }, typeof w === "string" ? { wort: w } : w)) : [x]);
+  const gesehen = new Set(S.karten.map(k => normal(k.wort)));
+  const zuWort = n => (schwer.find(k => normal(k.wort) === normal(n)) || {}).wort || String(n || "").trim();
+  return liste.map(x => { const e = eintragLesen(x); if (e) e.zu = zuWort(x.zu); return e; })
+    .filter(x => { if (!x) return false; const n = normal(x.wort);
+      if (!n || !x.erklaerung || gesehen.has(n) || erklaerungEnthaeltWort(x.erklaerung, x.wort)) return false;
+      gesehen.add(n); return true; });
+}
+
+/* ======================================================================
    Wort hinzufügen / bearbeiten
    ====================================================================== */
 let bearbeiteId = null;
+let formBild = null;    // ausdrückliche Bildwahl im Formular (wie k.bild), null = automatisch
+let formWiki;           // Wikipedia-Treffer im Formular (wie k.wiki)
+let formAktuell = null; // gerade angezeigtes Bild
+let fotoWartet = null;  // Foto aus „Foto von einem Ding“, wenn das Wort noch eingetippt wird
+let formLauf = 0;       // zählt hoch, damit alte Antworten das Formular nicht überschreiben
+
+function formKarte() { return { wort: $("n-wort-anzeige").textContent.trim(), kategorie: $("f-kat").value.trim(), bild: formBild || undefined, wiki: formWiki }; }
+function schritt(n) { $("neu-schritt1").classList.toggle("unsichtbar", n !== 1); $("neu-schritt2").classList.toggle("unsichtbar", n !== 2); }
+function fotoVorschau(daten, text) {
+  $("n-foto-vorschau").classList.toggle("unsichtbar", !daten); if (daten) $("n-foto-img").src = daten;
+  $("n-foto-hinweis").classList.toggle("unsichtbar", !text); $("n-foto-hinweis").textContent = text || "";
+  $("n-oder").classList.toggle("unsichtbar", !!daten); $("k-foto-ding2").classList.toggle("unsichtbar", !!daten);
+}
 function neuStarten() {
-  bearbeiteId = null;
+  bearbeiteId = null; formLauf++; formBild = null; formWiki = undefined; fotoWartet = null;
   $("neu-titel").textContent = "Neues Wort";
   $("f-wort").value = "";
-  $("neu-schritt1").classList.remove("unsichtbar");
-  $("neu-schritt2").classList.add("unsichtbar");
+  fotoVorschau(null);
+  schritt(1);
   $("k-loeschen-bearb").classList.add("unsichtbar");
   zeige("neu");
   setTimeout(() => $("f-wort").focus(), 50);
@@ -684,16 +1119,32 @@ function formularFuellen(d) {
   $("f-reim").value = d.reim || ""; $("f-silben").value = d.silben || silbenZaehlen(d.wort);
   pruefeWarnung();
 }
+async function formBildZeigen(info) {
+  const lauf = formLauf; const k = formKarte();
+  $("k-bild-zeichnen").classList.toggle("unsichtbar", !G.apiKey);
+  if (info) $("n-bild-info").textContent = info;
+  const b = k.wort ? await bildFuer(k) : null;
+  if (lauf !== formLauf) return;
+  formWiki = k.wiki; formAktuell = b;
+  bildSetzen($("n-bild"), $("n-bild-img"), $("n-bild-quelle"), b);
+  if (!info) $("n-bild-info").textContent = b ? "" : "Noch kein Bild. Du kannst ein eigenes Foto machen.";
+  $("k-bild-weg").classList.toggle("unsichtbar", !b);
+  $("k-bild-zeichnen").textContent = b && b.ki ? "Neu zeichnen" : "Zeichnen lassen";
+}
 $("k-weiter").addEventListener("click", wortWeiter);
 $("f-wort").addEventListener("keydown", e => { if (e.key === "Enter") wortWeiter(); });
 function wortWeiter() {
   const wort = $("f-wort").value.trim().replace(/\s+/g, " ");
   if (!wort) { $("f-wort").focus(); return; }
+  formLauf++; formWiki = undefined;
+  if (fotoWartet) { formBild = { art:"foto", daten: fotoWartet }; fotoWartet = null; }
+  else if (!(formBild && formBild.art === "foto")) formBild = null;
   const doppelt = S.karten.find(k => normal(k.wort) === normal(wort));
   const d = imWoerterbuch(wort);
-  $("neu-schritt1").classList.add("unsichtbar");
-  $("neu-schritt2").classList.remove("unsichtbar");
+  schritt(2);
   $("k-ki").classList.add("unsichtbar");
+  $("n-alternativen").classList.add("unsichtbar");
+  $("k-wort-aendern").classList.remove("unsichtbar");
   let hinweis;
   if (d) {
     formularFuellen({ wort: d.w, erklaerung: d.e, kategorie: d.k, artikel: d.a, reim: d.r, silben: d.s });
@@ -705,81 +1156,191 @@ function wortWeiter() {
   }
   if (doppelt) hinweis = "Hinweis: Dieses Wort steht schon in deiner Liste. " + hinweis;
   $("n-quelle").textContent = hinweis;
+  if (!d && G.apiKey && !formBild && S.einstellungen.bildart !== "foto") bildZeichnenLassen(true);
+  else formBildZeigen();
 }
+$("k-wort-aendern").addEventListener("click", () => {
+  formLauf++;
+  $("f-wort").value = $("n-wort-anzeige").textContent.trim().replace(/^…$/, "");
+  const foto = formBild && formBild.art === "foto" ? formBild.daten : null;
+  fotoVorschau(foto, foto ? "Dein Foto bleibt das Bild der Karte. Tipp jetzt das richtige Wort ein." : "");
+  schritt(1);
+  $("f-wort").focus();
+});
 function pruefeWarnung() { $("n-warn").classList.toggle("unsichtbar", !erklaerungEnthaeltWort($("f-erkl").value, $("n-wort-anzeige").textContent)); }
 $("f-erkl").addEventListener("input", pruefeWarnung);
 
-$("k-speichern").addEventListener("click", () => {
+/* ---------- Bild im Formular ---------- */
+$("k-foto").addEventListener("click", () => { $("f-foto").value = ""; $("f-foto").click(); });
+$("f-foto").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  const lauf = formLauf;
+  try { const daten = await fotoVerkleinern(f, 800, 0.8); if (lauf !== formLauf) return; formBild = { art:"foto", daten }; await formBildZeigen(); }
+  catch (err) { $("n-bild-info").textContent = "Das Foto konnte nicht geöffnet werden. Versuch es bitte noch einmal."; }
+});
+$("k-bild-zeichnen").addEventListener("click", () => bildZeichnenLassen(false));
+async function bildZeichnenLassen(automatisch) {
+  const wort = $("n-wort-anzeige").textContent.trim(); if (!G.apiKey || !wort) return formBildZeigen();
+  const lauf = formLauf; const knopf = $("k-bild-zeichnen"); knopf.disabled = true;
+  $("k-bild-zeichnen").classList.remove("unsichtbar");
+  $("n-bild-info").textContent = "Die KI zeichnet ein Bild. Einen Moment ...";
+  try {
+    const svg = await kiZeichnen(wort);
+    if (lauf !== formLauf || (automatisch && formBild && formBild.art === "foto")) return;
+    formBild = { art:"zeichnung", svg }; await formBildZeigen();
+  } catch (e) {
+    if (lauf === formLauf) await formBildZeigen("Die Zeichnung hat gerade nicht geklappt. Du kannst es nochmal versuchen oder ein eigenes Foto machen.");
+  } finally { knopf.disabled = false; }
+}
+$("k-bild-anders").addEventListener("click", async () => {
+  const lauf = formLauf; const k = formKarte(); const knopf = $("k-bild-anders"); knopf.disabled = true;
+  $("n-bild-info").textContent = "Ich suche ein anderes Bild ...";
+  try {
+    let neu;
+    if (formAktuell && formAktuell.art === "wiki" && formAktuell.seite) neu = await wikiAnderes(formAktuell.seite, formAktuell.src);
+    else { neu = formWiki !== undefined ? (formWiki || null) : await wikiSuchen(k.wort, k.kategorie); formWiki = neu || ""; }
+    if (lauf !== formLauf) return;
+    if (neu) { formBild = { art:"wiki", url: neu.url, seite: neu.seite }; await formBildZeigen(); }
+    else $("n-bild-info").textContent = "Ich habe kein anderes Bild gefunden. Du kannst ein eigenes Foto machen.";
+  } catch (e) { if (lauf === formLauf) $("n-bild-info").textContent = "Gerade keine Verbindung zu Wikipedia. Versuch es später noch einmal."; }
+  finally { knopf.disabled = false; }
+});
+$("k-bild-weg").addEventListener("click", () => { formBild = { art:"keins" }; formBildZeigen("Kein Bild. Mit „Anderes Bild“ oder „Eigenes Foto“ kommt wieder eins."); });
+
+/* Bildwahl aus dem Formular in die Karte übernehmen. Gibt eine Warnung zurück, wenn der Speicher knapp ist. */
+async function bildUebernehmen(k, fb) {
+  if (!fb) return "";
+  const key = bildSchluessel(K.id, k.wort);
+  const warFoto = k.bild && k.bild.art === "foto";
+  if (fb.art === "foto") {
+    if (!fb.daten) return "";
+    try { await fotoSpeichern(key, fb.daten); k.bild = { art:"foto" }; }
+    catch (e) { k.bild = { art:"foto", daten: fb.daten }; } // Ersatz, wenn IndexedDB fehlt: im normalen Speicher
+  } else { k.bild = fb; if (warFoto) fotoLoeschen(key); }
+  if (!sichern()) {
+    if (k.bild && k.bild.daten) { delete k.bild.daten; if (!warFoto) k.bild = undefined; sichern(); }
+    return "Das Foto passt nicht mehr in den Speicher. Bitte keine weiteren eigenen Fotos aufnehmen.";
+  }
+  if (speicherZeichen() > 2000000) return "Achtung: Der Speicher ist fast voll. Bitte keine weiteren eigenen Fotos aufnehmen.";
+  return "";
+}
+
+$("k-speichern").addEventListener("click", async () => {
   const wort = $("n-wort-anzeige").textContent.trim();
   const erklaerung = $("f-erkl").value.trim();
+  if (!wort || wort === "…") return;
   if (!erklaerung) { $("f-erkl").focus(); $("n-quelle").textContent = "Bitte noch eine kurze Erklärung eintragen. Die siehst du dann beim Üben."; return; }
   const daten = { wort, erklaerung, kategorie:$("f-kat").value, artikel:$("f-art").value, reim:$("f-reim").value, silben: parseInt($("f-silben").value,10) || silbenZaehlen(wort) };
-  if (bearbeiteId) {
-    const k = S.karten.find(x => x.id === bearbeiteId);
-    if (k) Object.assign(k, { erklaerung:daten.erklaerung.trim(), kategorie:daten.kategorie.trim(), artikel:daten.artikel.trim(), reim:daten.reim.trim(), silben:daten.silben });
-    sichern(); zeige("liste");
-  } else {
-    S.karten.push(karteAnlegen(daten)); sichern(); zeige("start");
-  }
+  const knopf = $("k-speichern"); if (knopf.disabled) return; knopf.disabled = true;
+  try {
+    let k;
+    if (bearbeiteId) {
+      k = S.karten.find(x => x.id === bearbeiteId);
+      if (k) Object.assign(k, { erklaerung:daten.erklaerung.trim(), kategorie:daten.kategorie.trim(), artikel:daten.artikel.trim(), reim:daten.reim.trim(), silben:daten.silben });
+    } else { k = karteAnlegen(daten); S.karten.push(k); }
+    if (k && formWiki !== undefined) k.wiki = formWiki;
+    const warnung = k ? await bildUebernehmen(k, formBild) : "";
+    sichern();
+    if (warnung) { startHinweis = warnung; zeige("start"); startHinweis = warnung; startZeichnen(); return; }
+    zeige(bearbeiteId ? "liste" : "start");
+  } finally { knopf.disabled = false; }
 });
 $("k-loeschen-bearb").addEventListener("click", () => { if (bearbeiteId) loeschenFragen(bearbeiteId, $("k-loeschen-bearb")); });
 
 function bearbeiten(id) {
   const k = S.karten.find(x => x.id === id); if (!k) return;
-  bearbeiteId = id;
+  bearbeiteId = id; formLauf++; fotoWartet = null;
+  formBild = k.bild ? Object.assign({}, k.bild) : null; formWiki = k.wiki;
   $("neu-titel").textContent = "Wort bearbeiten";
-  $("neu-schritt1").classList.add("unsichtbar");
-  $("neu-schritt2").classList.remove("unsichtbar");
+  schritt(2);
   $("k-ki").classList.toggle("unsichtbar", !G.apiKey);
   $("k-loeschen-bearb").classList.remove("unsichtbar");
-  $("n-quelle").textContent = "Hier kannst du Erklärung und Tipps ändern.";
+  $("k-wort-aendern").classList.add("unsichtbar");
+  $("n-alternativen").classList.add("unsichtbar");
+  $("n-quelle").textContent = "Hier kannst du Erklärung, Tipps und Bild ändern.";
   formularFuellen(k);
   zeige("neu");
+  formBildZeigen();
 }
 function loeschenFragen(id, ort) {
   const k = S.karten.find(x => x.id === id); if (!k) return;
   bestaetigen(ort, "„" + k.wort + "“ wirklich löschen?", [{ text:"Ja, löschen", cls:"rot-voll", fn: () => {
+    if (k.bild && k.bild.art === "foto") fotoLoeschen(bildSchluessel(K.id, k.wort));
     S.karten = S.karten.filter(x => x.id !== id); sichern(); zeige("liste");
   } }]);
 }
 
-/* KI-Erklärung über die Claude API (nur Test, Schlüssel lokal, gilt für alle Konten) */
 $("k-ki").addEventListener("click", kiHolen);
 async function kiHolen() {
   const wort = $("n-wort-anzeige").textContent.trim();
-  const key = G.apiKey; if (!key || !wort) return;
-  const knopf = $("k-ki"); knopf.disabled = true; knopf.textContent = "KI schreibt ...";
-  const prompt = "Ein älterer Mensch übt mit Karteikarten Wörter, die ihm im Gespräch nicht mehr einfallen (Wortfindung üben). " +
-    "Schreibe für das Wort \"" + wort + "\" die Vorderseite der Karte.\n" +
-    "Regeln: erklaerung = 1 bis 2 kurze, einfache Sätze auf Deutsch, die beschreiben, was es ist oder wofür man es braucht, alltagsnah. " +
-    "Das Wort selbst und Teile davon dürfen NICHT vorkommen. Keine Gedankenstriche. Freundlich, nicht kindlich. " +
-    "Schreib unpersönlich mit „man“. Falls du die lernende Person doch ansprichst, dann mit „du“, nie mit „Sie“.\n" +
-    "kategorie = ein einzelnes Wort als Gruppe (z. B. Küche, Werkzeug, Medizin, Garten).\n" +
-    "artikel = der, die oder das (leer, wenn kein Nomen).\n" +
-    "reim = ein einfaches deutsches Wort, das sich auf das Wort oder auf seinen letzten Wortteil reimt.";
-  const schema = { type:"object", additionalProperties:false, required:["erklaerung","kategorie","artikel","reim"],
-    properties: { erklaerung:{type:"string"}, kategorie:{type:"string"}, artikel:{type:"string"}, reim:{type:"string"} } };
-  const basis = { model:"claude-sonnet-5-5", max_tokens:2000, output_config:{ effort:"low", format:{ type:"json_schema", schema } },
-    messages:[{ role:"user", content: prompt }] };
-  const kopf = { "content-type":"application/json", "x-api-key": key, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" };
+  if (!G.apiKey || !wort) return;
+  const lauf = formLauf; const knopf = $("k-ki"); knopf.disabled = true; knopf.textContent = "KI schreibt ...";
   try {
-    // Erst mit automatischer Ausweich-Option (Fallback), bei Ablehnung des Parameters ohne.
-    let r = await fetch("https://api.anthropic.com/v1/messages", { method:"POST",
-      headers: Object.assign({ "anthropic-beta":"server-side-fallback-2026-07-01" }, kopf), body: JSON.stringify(Object.assign({ fallbacks:"default" }, basis)) });
-    if (r.status === 400) r = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers: kopf, body: JSON.stringify(basis) });
-    const j = await r.json();
-    if (!r.ok) throw new Error((j.error && j.error.message) || ("Fehler " + r.status));
-    if (j.stop_reason === "refusal") throw new Error("Die KI hat zu diesem Wort keine Erklärung geschrieben.");
-    const text = (j.content || []).filter(b => b.type === "text").map(b => b.text).join("");
-    const m = text.match(/\{[\s\S]*\}/); if (!m) throw new Error("Antwort nicht lesbar.");
-    const d = JSON.parse(m[0]);
-    const erkl = String(d.erklaerung||"").replace(/\s*[\u2014\u2013]\s*/g, ", ");
-    formularFuellen({ wort, erklaerung: erkl, kategorie: d.kategorie, artikel: d.artikel, reim: d.reim, silben: silbenZaehlen(wort) });
+    const d = await kiErklaerung(wort); if (lauf !== formLauf) return;
+    formularFuellen({ wort, erklaerung: d.erklaerung, kategorie: d.kategorie, artikel: d.artikel, reim: d.reim, silben: silbenZaehlen(wort) });
     $("n-quelle").textContent = "Die KI hat einen Vorschlag gemacht. Lies ihn kurz und ändere ihn, wenn nötig.";
   } catch (e) {
-    $("n-quelle").textContent = "Die KI hat gerade nicht geantwortet (" + e.message + "). Trag die Erklärung bitte selbst ein.";
+    if (lauf === formLauf) $("n-quelle").textContent = "Die KI hat gerade nicht geantwortet (" + e.message + "). Trag die Erklärung bitte selbst ein.";
   } finally { knopf.disabled = false; knopf.textContent = "Erklärung von der KI holen"; }
 }
+
+/* ---------- Foto von einem Ding: Foto machen, Karte entsteht ---------- */
+function fotoDingStarten() { $("f-foto-ding").value = ""; $("f-foto-ding").click(); }
+$("k-foto-ding").addEventListener("click", fotoDingStarten);
+$("k-foto-ding2").addEventListener("click", fotoDingStarten);
+$("f-foto-ding").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  bearbeiteId = null; formLauf++; const lauf = formLauf; formBild = null; formWiki = undefined; fotoWartet = null;
+  $("neu-titel").textContent = "Neues Wort"; $("k-loeschen-bearb").classList.add("unsichtbar");
+  $("f-wort").value = ""; fotoVorschau(null); schritt(1);
+  zeige("neu");
+  let klein, gross;
+  try { [klein, gross] = await Promise.all([fotoVerkleinern(f, 800, 0.8), fotoVerkleinern(f, 1024, 0.8)]); }
+  catch (err) { if (lauf === formLauf) fotoVorschau(null, "Das Foto konnte ich nicht öffnen. Versuch es bitte noch einmal."); return; }
+  if (lauf !== formLauf) return;
+  if (!G.apiKey) {
+    fotoWartet = klein;
+    fotoVorschau(klein, "Das Foto ist übernommen und wird das Bild der Karte. Damit die App das Ding von selbst erkennt, braucht es einen KI-Schlüssel (in den Einstellungen). Tipp jetzt bitte das Wort ein.");
+    $("f-wort").focus(); return;
+  }
+  formBild = { art:"foto", daten: klein };
+  formularFuellen({ wort:"…" });
+  schritt(2);
+  $("k-ki").classList.add("unsichtbar"); $("k-wort-aendern").classList.remove("unsichtbar"); $("n-alternativen").classList.add("unsichtbar");
+  $("n-quelle").textContent = "Ich schaue mir das Foto an. Einen Moment ...";
+  formBildZeigen();
+  $("k-speichern").disabled = true;
+  try {
+    const d = await kiErkennen(gross); if (lauf !== formLauf) return;
+    erkanntFuellen(d);
+  } catch (err) {
+    if (lauf !== formLauf) return;
+    fotoWartet = klein; formBild = null;
+    fotoVorschau(klein, "Ich konnte das Foto gerade nicht erkennen (" + err.message + "). Das Foto bleibt das Bild der Karte. Tipp bitte das Wort ein.");
+    schritt(1); $("f-wort").focus();
+  } finally { $("k-speichern").disabled = false; }
+});
+function erkanntFuellen(d) {
+  formularFuellen({ wort: d.wort, erklaerung: d.erklaerung, kategorie: d.kategorie, artikel: d.artikel, reim: d.reim, silben: silbenZaehlen(d.wort) });
+  let text = d.sicherheit === "niedrig"
+    ? "Ich bin mir nicht ganz sicher. Ist es „" + d.wort + "“? Sonst tipp unten auf das richtige Wort oder auf „Anderes Wort eintippen“."
+    : "Auf dem Foto ist „" + d.wort + "“. Prüf kurz, ob alles stimmt, und ändere es, wenn nötig.";
+  if (S.karten.some(k => normal(k.wort) === normal(d.wort))) text = "Hinweis: Dieses Wort steht schon in deiner Liste. " + text;
+  $("n-quelle").textContent = text;
+  const box = $("n-alternativen");
+  if (d.sicherheit !== "niedrig" || !d.alternativen.length) { box.classList.add("unsichtbar"); box.innerHTML = ""; return; }
+  box._optionen = [d].concat(d.alternativen);
+  box.innerHTML = "<p style='margin:0 0 4px'><b>Oder ist es eins davon?</b></p>" + box._optionen.map((a, i) =>
+    "<button type='button' class='leise-knopf' data-alt='" + i + "' aria-pressed='" + (i === 0) + "'>" + esc((a.artikel ? a.artikel + " " : "") + a.wort) + "</button>").join("");
+  box.classList.remove("unsichtbar");
+}
+$("n-alternativen").addEventListener("click", e => {
+  const b = e.target.closest("button[data-alt]"); if (!b) return;
+  const box = $("n-alternativen"); const a = box._optionen[+b.dataset.alt]; if (!a) return;
+  box.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  formularFuellen({ wort: a.wort, erklaerung: a.erklaerung, kategorie: a.kategorie, artikel: a.artikel, reim: a.reim, silben: silbenZaehlen(a.wort) });
+  $("n-quelle").textContent = "Gut, dann „" + a.wort + "“. Prüf kurz die Erklärung und tipp dann auf Speichern.";
+});
 
 /* ======================================================================
    Üben (Sitzung, Tipps, Punkte, Leitner-Plan)
@@ -792,6 +1353,7 @@ const TROST = ["Kein Problem. Jetzt hast du es gesehen, das hilft schon.", "Mach
 function tippListe(k) {
   const t = [];
   t.push({ name:"Gruppe", text: (k.kategorie ? k.kategorie : "ein Ding") + (k.artikel ? ". Es heißt „" + k.artikel + " ...“" : "") });
+  if (S.einstellungen.bilder !== false && S.einstellungen.bildAlsTipp) t.push({ name:"Bild", bild:true });
   t.push({ name:"Silben", text: k.silben + (k.silben === 1 ? " Silbe" : " Silben") });
   t.push({ name:"Erster Buchstabe", text: k.wort.charAt(0).toUpperCase() });
   if (k.reim) t.push({ name:"Klingt ähnlich wie", text: k.reim });
@@ -812,16 +1374,19 @@ function sitzungStarten() {
   }
   if (!istZeit) stapel = stapel.slice(0, wert);
   if (!stapel.length) return;
-  U = { stapel: stapel.map(k => k.id), pos: 0, istZeit, ende: istZeit ? Date.now() + wert*60000 : 0, punkte:0, gezeigt:0, wiederholt:{}, ergebnisse:[] };
+  U = { stapel: stapel.map(k => k.id), pos: 0, istZeit, ende: istZeit ? Date.now() + wert*60000 : 0, punkte:0, gezeigt:0, wiederholt:{}, ergebnisse:[], schwer:{}, nr:0 };
   tag().sitzungen += 1; sichern();
   zeige("ueben");
   karteZeigen();
+  // Bilder der nächsten Karten schon im Hintergrund holen (Wikipedia nur, wenn nötig)
+  if (S.einstellungen.bilder !== false) (async () => { for (const id of U.stapel.slice(0, 30)) { const k = S.karten.find(x => x.id === id); if (k) { try { await bildFuer(k); } catch (e) {} } } })();
 }
 function aktuelleKarte() { return S.karten.find(k => k.id === U.stapel[U.pos]); }
 function karteZeigen() {
   const k = aktuelleKarte();
   if (!k) return sitzungEnde();
-  U.tipps = 0; U.liste = tippListe(k); U.fertig = false;
+  srStop(); mikroHinweis("");
+  U.tipps = 0; U.liste = tippListe(k); U.fertig = false; U.nr += 1; U.bild = null; U.bildFertig = false; U.bildGezeigt = false;
   $("u-erkl").textContent = k.erklaerung;
   $("u-tipps").innerHTML = "";
   $("f-antwort").value = "";
@@ -830,6 +1395,14 @@ function karteZeigen() {
   $("u-ergebnis").classList.add("unsichtbar");
   $("u-fortschritt").textContent = U.istZeit ? "Karte " + (U.gezeigt+1) + ", noch " + Math.max(0, Math.ceil((U.ende-Date.now())/60000)) + " Min." : "Karte " + (U.pos+1) + " von " + U.stapel.length;
   $("u-punkte").textContent = U.punkte + " Punkte";
+  bildSetzen($("u-bild"), $("u-bild-img"), $("u-bild-quelle"), null);
+  const einst = S.einstellungen, nr = U.nr;
+  if (einst.bilder !== false) bildFuer(k).catch(() => null).then(b => {
+    if (!U || U.nr !== nr) return;
+    U.bild = b; U.bildFertig = true;
+    if (!b) { const i = U.liste.findIndex((t, j) => t.bild && j >= U.tipps); if (i >= 0) { U.liste.splice(i, 1); tippKnopf(); } return; }
+    if (!einst.bildAlsTipp || U.bildGezeigt) bildSetzen($("u-bild"), $("u-bild-img"), $("u-bild-quelle"), b);
+  });
   tippKnopf();
 }
 function tippKnopf() {
@@ -838,10 +1411,15 @@ function tippKnopf() {
   $("k-tipp").textContent = rest > 0 ? "Tipp bekommen (noch " + rest + ")" : "Keine Tipps mehr";
 }
 $("k-tipp").addEventListener("click", () => {
-  if (U.tipps >= U.liste.length) return;
+  // Bild-Tipp überspringen, wenn es (noch) kein Bild gibt
+  while (U.tipps < U.liste.length && U.liste[U.tipps].bild && !U.bild) U.liste.splice(U.tipps, 1);
+  if (U.tipps >= U.liste.length) return tippKnopf();
   const t = U.liste[U.tipps++];
   const li = document.createElement("li");
-  li.innerHTML = "<b>" + esc(t.name) + ":</b> " + (t.luecke ? "<span class='luecke'>" + esc(t.text) + "</span>" : esc(t.text));
+  if (t.bild) {
+    U.bildGezeigt = true; bildSetzen($("u-bild"), $("u-bild-img"), $("u-bild-quelle"), U.bild);
+    li.innerHTML = "<b>Bild:</b> oben auf der Karte";
+  } else li.innerHTML = "<b>" + esc(t.name) + ":</b> " + (t.luecke ? "<span class='luecke'>" + esc(t.text) + "</span>" : esc(t.text));
   $("u-tipps").appendChild(li);
   tippKnopf();
 });
@@ -851,23 +1429,97 @@ $("k-vorlesen").addEventListener("click", () => {
 });
 function punkteFuer(tipps) { return Math.max(10, 100 - tipps * TIPP_ABZUG); }
 
+/* Tolerante Prüfung, auch wenn das Wort in einem kurzen Satz steht ("das ist eine Spritze").
+   Geprüft werden der ganze Text, jedes einzelne Wort und je zwei Wörter zusammen ("Gieß Kanne"). */
+const RANG = { falsch:0, fast:1, richtig:2 };
+function kandidaten(text) {
+  const t = String(text || "").trim(); const out = [t];
+  const w = t.split(/[\s,.!?;:]+/).filter(Boolean);
+  if (w.length > 1 && w.length <= 8) w.forEach((x, i) => { out.push(x); if (w[i+1]) out.push(x + w[i+1]); });
+  return out;
+}
+function besterTreffer(texte, wort) {
+  let best = { text: String(texte[0] || "").trim(), ergebnis: "falsch" };
+  for (const t of texte) for (const c of kandidaten(t)) {
+    const v = vergleiche(c, wort);
+    if (RANG[v] > RANG[best.ergebnis]) best = { text: c, ergebnis: v };
+    if (v === "richtig") return best;
+  }
+  return best;
+}
+
 $("k-pruefen").addEventListener("click", pruefen);
 $("f-antwort").addEventListener("keydown", e => { if (e.key === "Enter") pruefen(); });
 function pruefen() {
   const k = aktuelleKarte(); const ein = $("f-antwort").value;
   if (!ein.trim()) { $("f-antwort").focus(); return; }
-  const v = vergleiche(ein, k.wort);
+  const v = besterTreffer([ein], k.wort).ergebnis;
   if (v === "richtig") return abschliessen(k, "richtig", punkteFuer(U.tipps));
   if (v === "fast") return abschliessen(k, "fast", Math.max(10, punkteFuer(U.tipps) - 10));
   // Falsch: freundlich, nochmal versuchen lassen
+  U.schwer[k.id] = true;
   $("f-antwort").value = "";
   const li = document.createElement("li");
   li.innerHTML = "<b>Noch nicht ganz.</b> „" + esc(ein.trim()) + "“ ist es nicht. Versuch es nochmal oder hol dir einen Tipp.";
   li.style.background = "var(--blau-hell)";
   $("u-tipps").appendChild(li);
 }
+
+/* ---------- Mikrofon-Knopf (Spracherkennung) ----------
+   Hinweis: Auf dem iPhone kann die Spracherkennung in Safari funktionieren, in der App vom
+   Home-Bildschirm aber eventuell nicht (oder die Erlaubnis fehlt). Deshalb gibt es immer den Ausweg:
+   ins Feld tippen und das Mikrofon der Tastatur (Diktieren) benutzen. */
+let SR = null, srVerweigert = false;
+function srKlasse() { return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
+function mikroZustand(an) {
+  $("k-mikro").classList.toggle("hoert", an); $("k-mikro").setAttribute("aria-label", an ? "Zuhören beenden" : "Wort sagen");
+  $("u-mikro-text").textContent = an ? "Ich höre zu …" : "Antippen und Wort sagen"; $("u-mikro-text").classList.toggle("hoert", an);
+}
+function mikroHinweis(text) { const h = $("u-mikro-hinweis"); h.textContent = text || ""; h.classList.toggle("unsichtbar", !text); }
+function srStop() {
+  const r = SR; SR = null;
+  if (r) { r.onresult = null; r.onerror = null; r.onend = null; try { r.abort(); } catch (e) {} }
+  mikroZustand(false);
+}
+function mikroAusweg() { srStop(); mikroHinweis("Tippe ins Feld und dann auf das Mikrofon der Tastatur."); try { $("f-antwort").focus(); } catch (e) {} }
+$("k-mikro").addEventListener("click", () => {
+  if (SR) return srStop();
+  const C = srKlasse();
+  if (!C || srVerweigert) return mikroAusweg();
+  mikroHinweis("");
+  let r;
+  try { r = new C(); r.lang = "de-DE"; r.interimResults = true; r.maxAlternatives = 5; r.continuous = false; } catch (e) { return mikroAusweg(); }
+  r.onresult = ev => {
+    const alt = []; let fertig = false;
+    for (let i = ev.resultIndex || 0; i < ev.results.length; i++) {
+      const res = ev.results[i];
+      for (let j = 0; j < res.length; j++) if (res[j] && res[j].transcript) alt.push(res[j].transcript);
+      if (res.isFinal) fertig = true;
+    }
+    if (!alt.length) return;
+    if (!fertig) { $("f-antwort").value = alt[0].trim(); return; }
+    srStop(); spracheAuswerten(alt);
+  };
+  r.onerror = ev => {
+    const f = ev && ev.error;
+    if (f === "not-allowed" || f === "service-not-allowed") { srVerweigert = true; return mikroAusweg(); }
+    if (f === "audio-capture" || f === "network" || f === "language-not-supported") return mikroAusweg();
+    srStop();
+    if (f === "no-speech") mikroHinweis("Ich habe nichts gehört. Tipp nochmal auf das Mikrofon und sag das Wort.");
+    else if (f !== "aborted") mikroHinweis("Das hat nicht geklappt. Tipp nochmal auf das Mikrofon oder schreib das Wort ins Feld.");
+  };
+  r.onend = () => { if (SR === r) { SR = null; mikroZustand(false); } };
+  try { r.start(); SR = r; mikroZustand(true); } catch (e) { mikroAusweg(); }
+});
+function spracheAuswerten(alt) {
+  const k = U && aktuelleKarte(); if (!k || U.fertig) return;
+  const t = besterTreffer(alt, k.wort);
+  $("f-antwort").value = t.ergebnis === "falsch" ? String(alt[0]).trim() : t.text;
+  pruefen();
+}
+
 $("k-weiss").addEventListener("click", () => {
-  const k = aktuelleKarte();
+  const k = aktuelleKarte(); srStop();
   $("u-selbst-wort").textContent = k.wort;
   $("u-frage").classList.add("unsichtbar");
   $("u-selbst").classList.remove("unsichtbar");
@@ -878,6 +1530,8 @@ $("k-aufdecken").addEventListener("click", () => abschliessen(aktuelleKarte(), "
 
 function abschliessen(k, ergebnis, punkte) {
   if (U.fertig) return; U.fertig = true;
+  srStop();
+  if (ergebnis === "falsch" || U.tipps >= 3) U.schwer[k.id] = true; // für die Vorschläge am Ende
   // Bewertung für den Plan
   let guete;
   if (ergebnis === "falsch") guete = "falsch";
@@ -900,6 +1554,8 @@ function abschliessen(k, ergebnis, punkte) {
     U.wiederholt[k.id] = (U.wiederholt[k.id] || 0) + 1;
     U.stapel.splice(Math.min(U.stapel.length, U.pos + 4), 0, k.id);
   }
+  // Nach der Antwort darf das Bild zu sehen sein (auch im Modus „Bild erst als Tipp“)
+  if (U.bild) bildSetzen($("u-bild"), $("u-bild-img"), $("u-bild-quelle"), U.bild);
   // Rückmeldung, ab und zu mit Namen
   let text, cls;
   if (ergebnis === "richtig") { text = mitName(U.tipps === 0 ? zufall(LOB_GUT) : zufall(LOB_MIT_TIPP)); cls = "gut"; }
@@ -921,15 +1577,102 @@ $("k-naechste").addEventListener("click", () => {
 });
 $("k-ueben-ende").addEventListener("click", sitzungEnde);
 function sitzungEnde() {
+  srStop();
   if (!U) return zeige("start");
   const n = U.ergebnisse.length;
   const gekonnt = U.ergebnisse.filter(e => e.punkte > 0).length;
+  const schwer = Object.keys(U.schwer).map(id => S.karten.find(k => k.id === id)).filter(Boolean);
   $("fertig-titel").textContent = n === 0 ? "Bis bald, " + K.name + "!" : "Geschafft, " + K.name + "!";
   $("fertig-text").innerHTML = n === 0 ? "<p>Heute nichts geübt. Das ist in Ordnung, beim nächsten Mal geht es weiter.</p>"
     : "<p><b>" + n + "</b> Karten geübt, davon <b>" + gekonnt + "</b> gefunden.</p><p class='punkte' style='color:var(--blau)'>" + U.punkte + " Punkte</p>" +
       "<p>" + (tag().sitzungen >= 2 ? "Das war schon die " + tag().sitzungen + ". Sitzung heute. Toll!" : "Wenn du magst: später am Tag noch eine kurze Runde.") + "</p>";
   U = null;
   zeige("fertig");
+  if (schwer.length) vorschlaegeZeigen($("fertig-vorschlaege"), schwer);
+  else $("fertig-vorschlaege").classList.add("unsichtbar");
+}
+
+/* ======================================================================
+   Passende neue Wörter vorschlagen (nach der Übung und in der Wortliste)
+   ====================================================================== */
+const HAKEN = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+let vorschlagLauf = 0;
+/* Ohne KI: Wörter derselben Gruppe aus dem Startwörterbuch, die noch nicht im Konto sind */
+function woerterbuchVorschlaege(schwer) {
+  const gesehen = new Set(S.karten.map(k => normal(k.wort))); const out = [];
+  schwer.forEach(k => {
+    const kat = (k.kategorie || (imWoerterbuch(k.wort) || {}).k || "").toLowerCase(); if (!kat) return;
+    WOERTERBUCH.filter(d => d.k.toLowerCase() === kat && !gesehen.has(normal(d.w))).slice(0, 4).forEach(d => {
+      gesehen.add(normal(d.w)); out.push({ zu: k.wort, wort: d.w, artikel: d.a, erklaerung: d.e, kategorie: d.k, reim: d.r, silben: d.s });
+    });
+  });
+  return out;
+}
+function vorschlaegeZeigen(box, schwer) {
+  const lauf = String(++vorschlagLauf); box.dataset.lauf = lauf;
+  box.classList.remove("unsichtbar");
+  box.innerHTML = "<h2 style='margin-top:0'>Passende neue Wörter</h2><div class='v-inhalt'></div>";
+  const inhalt = box.querySelector(".v-inhalt");
+  if (!G.apiKey) {
+    const liste = woerterbuchVorschlaege(schwer);
+    return vorschlagListe(box, inhalt, liste, "Mit einem KI-Schlüssel (in den Einstellungen) findet die App zu jedem schweren Wort passende neue Wörter." +
+      (liste.length ? " Diese hier passen schon aus dem eingebauten Wörterbuch:" : ""));
+  }
+  inhalt.innerHTML = "<p class='hinweis'>Ich suche passende Wörter. Einen Moment ...</p>";
+  kiVorschlaege(schwer).then(liste => {
+    if (box.dataset.lauf !== lauf) return;
+    vorschlagListe(box, inhalt, liste, liste.length ? "Tipp die Wörter an, die du üben möchtest." : "");
+  }).catch(() => {
+    if (box.dataset.lauf !== lauf) return;
+    const liste = woerterbuchVorschlaege(schwer);
+    vorschlagListe(box, inhalt, liste, "Die KI hat gerade nicht geantwortet." + (liste.length ? " Diese Wörter aus dem eingebauten Wörterbuch passen:" : " Versuch es später noch einmal."));
+  });
+}
+function vorschlagListe(box, inhalt, liste, text) {
+  // nach dem Wort sortieren, zu dem sie passen (Reihenfolge des ersten Auftretens)
+  const reihe = []; liste.forEach(v => { if (!reihe.includes(v.zu)) reihe.push(v.zu); });
+  liste = liste.slice().sort((a, b) => reihe.indexOf(a.zu) - reihe.indexOf(b.zu));
+  box._liste = liste;
+  let html = text ? "<p class='hinweis'>" + esc(text) + "</p>" : "", zu = null;
+  if (!liste.length) html += "<p>Gerade gibt es keine neuen passenden Wörter.</p>";
+  liste.forEach((v, i) => {
+    if (v.zu !== zu) { zu = v.zu; if (zu) html += "<p class='vorschlag-gruppe'>Passend zu „" + esc(zu) + "“</p>"; }
+    html += "<button type='button' class='vorschlag' aria-pressed='false' data-i='" + i + "'><span class='haken'>" + HAKEN + "</span><span>" +
+      "<span class='v-wort'>" + esc((v.artikel ? v.artikel + " " : "") + v.wort) + "</span><span class='v-erkl'>" + esc(v.erklaerung) + "</span></span></button>";
+  });
+  if (liste.length) html += "<button type='button' class='gruen k-hinzufuegen' disabled>Ausgewählte hinzufügen</button>";
+  html += "<p class='v-meldung willkommen-box unsichtbar'></p>";
+  inhalt.innerHTML = html;
+}
+function vorschlagZaehlen(box) {
+  const n = box.querySelectorAll("button.vorschlag[aria-pressed='true']").length; const h = box.querySelector(".k-hinzufuegen");
+  if (h) { h.disabled = n === 0; h.textContent = n ? "Ausgewählte hinzufügen (" + n + ")" : "Ausgewählte hinzufügen"; }
+}
+function vorschlagKlick(e) {
+  const box = e.currentTarget;
+  const v = e.target.closest("button.vorschlag");
+  if (v) { v.setAttribute("aria-pressed", v.getAttribute("aria-pressed") === "true" ? "false" : "true"); return vorschlagZaehlen(box); }
+  const h = e.target.closest("button.k-hinzufuegen"); if (!h) return;
+  let n = 0;
+  box.querySelectorAll("button.vorschlag[aria-pressed='true']").forEach(b => {
+    const x = box._liste[+b.dataset.i]; b.remove();
+    if (!x || S.karten.some(k => normal(k.wort) === normal(x.wort))) return;
+    S.karten.push(karteAnlegen({ wort: x.wort, artikel: x.artikel, erklaerung: x.erklaerung, kategorie: x.kategorie, reim: x.reim, silben: x.silben })); n++;
+  });
+  sichern();
+  box.querySelectorAll(".vorschlag-gruppe").forEach(p => { const nx = p.nextElementSibling; if (!nx || !nx.classList.contains("vorschlag")) p.remove(); });
+  const m = box.querySelector(".v-meldung");
+  m.textContent = (n === 1 ? "1 Wort ist" : n + " Wörter sind") + " jetzt in deiner Liste. Sie kommen bei der nächsten Übung dran.";
+  m.classList.remove("unsichtbar");
+  if (!box.querySelector("button.vorschlag")) h.classList.add("unsichtbar"); else vorschlagZaehlen(box);
+}
+$("fertig-vorschlaege").addEventListener("click", vorschlagKlick);
+$("aehnlich-vorschlaege").addEventListener("click", vorschlagKlick);
+function aehnlichZeigen(id) {
+  const k = S.karten.find(x => x.id === id); if (!k) return;
+  $("aehnlich-titel").textContent = "Ähnlich wie „" + k.wort + "“";
+  zeige("aehnlich");
+  vorschlaegeZeigen($("aehnlich-vorschlaege"), [k]);
 }
 
 /* ======================================================================
@@ -943,13 +1686,15 @@ function listeZeichnen() {
     const info = k.versuche ? k.richtig + " von " + k.versuche + " gefunden" + (k.faellig <= heute() ? ", heute dran" : ", wieder dran am " + k.faellig.split("-").reverse().join(".")) : "noch nicht geübt";
     return "<li><div class='kopf'><span class='wort'>" + esc(k.wort) + "</span><span class='stand " + s.cls + "'>" + s.text + "</span></div>" +
       "<div class='leise klein-text'>" + esc(info) + "</div>" +
-      "<button class='klein' data-bearb='" + esc(k.id) + "'>Bearbeiten</button><button class='klein leise-knopf' data-loesch='" + esc(k.id) + "'>Löschen</button></li>";
+      "<button class='klein' data-bearb='" + esc(k.id) + "'>Bearbeiten</button><button class='klein leise-knopf' data-loesch='" + esc(k.id) + "'>Löschen</button>" +
+      "<button class='klein leise-knopf' data-aehnlich='" + esc(k.id) + "'>Ähnliche Wörter finden</button></li>";
   }).join("") : "<li class='leise'>Noch keine Wörter.</li>";
 }
 $("wortliste").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || b.closest("#bestaetigung")) return;
   if (b.dataset.bearb) bearbeiten(b.dataset.bearb);
   if (b.dataset.loesch) loeschenFragen(b.dataset.loesch, b);
+  if (b.dataset.aehnlich) aehnlichZeigen(b.dataset.aehnlich);
 });
 
 /* ======================================================================
@@ -967,7 +1712,19 @@ function einstZeichnen() {
   $("k-export").textContent = "Sicherung für " + K.name + " speichern";
   $("k-export-alle").textContent = "Alle Konten sichern (" + G.konten.length + ")";
   $("k-export-alle").classList.toggle("unsichtbar", G.konten.length < 2);
+  bildEinstZeichnen();
 }
+function schalterSetzen(b, an) { b.setAttribute("aria-pressed", an ? "true" : "false"); b.querySelector(".an-aus").textContent = an ? "An" : "Aus"; }
+function bildEinstZeichnen() {
+  const e = S.einstellungen;
+  schalterSetzen($("k-bilder"), e.bilder !== false);
+  schalterSetzen($("k-bild-tipp"), !!e.bildAlsTipp);
+  $("k-bild-tipp").disabled = e.bilder === false;
+  document.querySelectorAll("#bildart-wahl button").forEach(b => b.setAttribute("aria-pressed", b.dataset.b === (e.bildart || "zeichnung") ? "true" : "false"));
+}
+$("k-bilder").addEventListener("click", () => { S.einstellungen.bilder = S.einstellungen.bilder === false; sichern(); bildEinstZeichnen(); });
+$("k-bild-tipp").addEventListener("click", () => { S.einstellungen.bildAlsTipp = !S.einstellungen.bildAlsTipp; sichern(); bildEinstZeichnen(); });
+document.querySelectorAll("#bildart-wahl button").forEach(b => b.addEventListener("click", () => { S.einstellungen.bildart = b.dataset.b; sichern(); bildEinstZeichnen(); }));
 
 /* ---------- Konto ---------- */
 $("k-name").addEventListener("click", () => {
@@ -992,6 +1749,7 @@ $("k-konto-loeschen").addEventListener("click", () => {
 });
 function kontoLoeschen() {
   const name = K.name;
+  fotosKontoLoeschen(K.id);
   G.konten = G.konten.filter(k => k !== K); K = null; S = null; G.aktiv = null; sichern();
   if (!G.konten.length) return willkommenZeigen("erst");
   if (G.konten.length === 1) { kontoWaehlen(G.konten[0].id); zeige("start"); return; }
@@ -1063,7 +1821,7 @@ function alleLadenFragen(konten, ort) {
 $("k-key").addEventListener("click", () => { G.apiKey = $("f-key").value.trim(); sichern(); meldung(G.apiKey ? "Schlüssel gespeichert (gilt für alle Konten)." : "Schlüssel entfernt.", $("k-key")); });
 $("k-reset").addEventListener("click", () => {
   bestaetigen($("k-reset"), "Wirklich alle Wörter und Punkte von " + K.name + " löschen? Das kann man nicht rückgängig machen. Das Konto selbst bleibt.",
-    [{ text:"Ja, alles löschen", cls:"rot-voll", fn: () => { datenSetzen(K, leereDaten()); sichern(); zeige("start"); } }]);
+    [{ text:"Ja, alles löschen", cls:"rot-voll", fn: () => { fotosKontoLoeschen(K.id); datenSetzen(K, leereDaten()); sichern(); zeige("start"); } }]);
 });
 
 /* ======================================================================
